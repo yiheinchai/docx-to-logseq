@@ -5,7 +5,7 @@ export enum NoteType {
 }
 
 export interface Note {
-    index: string;
+    path: string;
     children: (TextNote | ImageNote | TableNote)[];
 }
 

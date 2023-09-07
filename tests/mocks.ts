@@ -23,25 +23,25 @@ export const symbol_Wingdings = /*html*/ `<span style="font-family: Wingdings">S
 export const symbol_CourierNew = /*html*/ `<span style="font-family: 'Courier New'">Symbol text</span>`;
 
 export const mockTreeNotes: TextNote = {
-    index: "0",
+    path: "",
     text: "Renal Physiology",
     children: [
         {
-            index: "0;0",
+            path: "0;0",
             text: "Learning Outcomes",
             children: [],
         },
         {
-            index: "0;1",
+            path: "0;1",
             text: "Renal Function",
             children: [
                 {
-                    index: "0;1;0",
+                    path: "0;1;0",
                     text: "Homeostasis",
                     children: [],
                 },
                 {
-                    index: "0;1;1",
+                    path: "0;1;1",
                     text: "Hypertension",
                     children: [],
                 },

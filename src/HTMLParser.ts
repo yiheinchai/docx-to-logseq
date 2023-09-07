@@ -47,6 +47,20 @@ export function cleanText(text: string) {
 }
 
 /**
+ * Append new path onto the existing path to note
+ * @param path
+ * @param index
+ * @returns
+ */
+export function addIndexToPath(path: number[], index) {
+    return [...path, index];
+}
+
+export function pathToString(path: number[]) {
+    return path.join(";");
+}
+
+/**
  * Check if the HTML element is meant to contain a bullet point in word
  *
  * @param element
@@ -73,20 +87,19 @@ export function checkIfSymbol(element: Node | HTMLElement) {
  * @param previousIndex
  * @returns
  */
-export function insertSibilingInLatestAndDeepestDepths(object, dataToBeInserted, previousId: string = "") {
+export function insertSibilingInLatestAndDeepestDepths(object, dataToBeInserted, path: number[] = []) {
     const lastChildIndex = object.children.length - 1;
     const numGrandChildren = object.children[lastChildIndex].children.length;
 
     // Insert data if the chlld of current node is the deepest node
     if (numGrandChildren === 0) {
         const indexForInsertion = lastChildIndex + 1; // get index of the position in which data will be inserted
-        const id = [previousId, indexForInsertion.toString()].join(";");
-        return insertChildren(object, { ...dataToBeInserted, index: id });
+        const newPath = pathToString(addIndexToPath(path, indexForInsertion));
+        return insertChildren(object, { ...dataToBeInserted, path: newPath });
     } else {
         // Dive into the latest node if its not the deepest node yet
         const indexForInsertion = lastChildIndex;
-        const id = [previousId, indexForInsertion.toString()].join(";");
-        return insertSibilingInLatestAndDeepestDepths(object.children[lastChildIndex], dataToBeInserted, id);
+        return insertSibilingInLatestAndDeepestDepths(object.children[lastChildIndex], dataToBeInserted, addIndexToPath(path, indexForInsertion));
     }
 }
 
@@ -95,18 +108,17 @@ export function insertSibilingInLatestAndDeepestDepths(object, dataToBeInserted,
  * Inserts data as a child of the deepest node
  * @param object
  * @param dataToBeInserted
- * @param previousId
+ * @param path
  * @returns
  */
-export function insertChildInLatestAndDeepestDepths(object, dataToBeInserted, previousId: string = "") {
+export function insertChildInLatestAndDeepestDepths(object, dataToBeInserted, path: number[] = []) {
     // Insert data if the current node is the deepest node
     if (object.children.length === 0) {
-        return insertChildren(object, { ...dataToBeInserted, index: [previousId, "0"].join(";") });
+        return insertChildren(object, { ...dataToBeInserted, path: pathToString(addIndexToPath(path, 0)) });
     } else {
         // Dive into the latest node if its not the deepest node yet
         const lastChildIndex = object.children.length - 1;
-        const id = [previousId, lastChildIndex.toString()].join(";");
-        return insertChildInLatestAndDeepestDepths(object.children[lastChildIndex], dataToBeInserted, id);
+        return insertChildInLatestAndDeepestDepths(object.children[lastChildIndex], dataToBeInserted, addIndexToPath(path, lastChildIndex));
     }
 }
 
@@ -118,12 +130,17 @@ export function insertChildInLatestAndDeepestDepths(object, dataToBeInserted, pr
  * @param numDepthsLeft
  * @returns
  */
-export function insertChildInLatestAndAtSpecifiedDepth(object, dataToBeInserted, numDepthsLeft) {
+export function insertChildInLatestAndAtSpecifiedDepth(object, dataToBeInserted, numDepthsLeft: number, path: number[] = []) {
     const lastChildIndex = object.children.length - 1;
     if (numDepthsLeft === 0) {
-        return insertChildren(object, dataToBeInserted);
+        return insertChildren(object, { ...dataToBeInserted, path: pathToString(addIndexToPath(path, lastChildIndex + 1)) });
     } else {
-        return insertChildInLatestAndAtSpecifiedDepth(object.children[lastChildIndex], dataToBeInserted, numDepthsLeft - 1);
+        return insertChildInLatestAndAtSpecifiedDepth(
+            object.children[lastChildIndex],
+            dataToBeInserted,
+            numDepthsLeft - 1,
+            addIndexToPath(path, lastChildIndex)
+        );
     }
 }
 
@@ -136,15 +153,19 @@ export function insertChildInLatestAndAtSpecifiedDepth(object, dataToBeInserted,
  * @param previousIndex
  * @returns
  */
-export function insertSibilingAtSpecifiedDepth(object, dataToBeInserted, depth, previousIndex = "") {
+export function insertSibilingAtSpecifiedDepth(object, dataToBeInserted, depth, path: number[] = []) {
     if (depth === 1) {
         const currentLevelIndex = object.children.length - 1 + 1;
-        const newIndex = previousIndex + currentLevelIndex.toString().padStart(2, "0");
-        return insertChildren(object, { ...dataToBeInserted, index: newIndex });
+        const newPath = pathToString(addIndexToPath(path, currentLevelIndex));
+        return insertChildren(object, { ...dataToBeInserted, path: newPath });
     } else {
         const currentLevelIndex = object.children.length - 1;
-        const newIndex = previousIndex + currentLevelIndex.toString().padStart(2, "0");
-        return insertSibilingAtSpecifiedDepth(object.children[object.children.length - 1], dataToBeInserted, depth - 1, newIndex);
+        return insertSibilingAtSpecifiedDepth(
+            object.children[object.children.length - 1],
+            dataToBeInserted,
+            depth - 1,
+            addIndexToPath(path, currentLevelIndex)
+        );
     }
 }
 
@@ -154,7 +175,7 @@ export function insertSibilingAtSpecifiedDepth(object, dataToBeInserted, depth, 
  * @param dataToBeInserted
  * @returns
  */
-export function insertChildren(object, dataToBeInserted) {
+export function insertChildren(object, dataToBeInserted: Note) {
     object.children.push(dataToBeInserted);
     return object;
 }

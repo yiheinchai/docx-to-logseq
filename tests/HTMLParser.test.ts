@@ -175,10 +175,11 @@ describe("insertSibilingInLatestAndDeepestDepths", () => {
     it("correctly inserts data in the last node as the last children", () => {
         const mockNotes = deepCopy(mockTreeNotes);
         const mockNoteToBeInserted = deepCopy(mockNote);
+        mockNoteToBeInserted["path"] = "1;2";
 
         insertSibilingInLatestAndDeepestDepths(mockNotes, mockNoteToBeInserted);
 
-        expect(mockNotes.children[1].children[2]).toBe(mockNoteToBeInserted);
+        expect(mockNotes.children[1].children[2]).toStrictEqual(mockNoteToBeInserted);
     });
 });
 
@@ -186,10 +187,11 @@ describe("insertChildInLatestAndDeepestDepths", () => {
     it("correctly inserts data as its only children", () => {
         const mockNotes = deepCopy(mockTreeNotes);
         const mockNoteToBeInserted = deepCopy(mockNote);
+        mockNoteToBeInserted["path"] = "1;1;0";
 
         insertChildInLatestAndDeepestDepths(mockNotes, mockNoteToBeInserted);
 
-        expect(mockNotes.children[1].children[1].children[0]).toBe(mockNoteToBeInserted);
+        expect(mockNotes.children[1].children[1].children[0]).toStrictEqual(mockNoteToBeInserted);
     });
 });
 
@@ -197,10 +199,11 @@ describe("insertChildInLatestAndAtSpecifiedDepth", () => {
     it("correctly inserts data at the right depth", () => {
         const mockNotes = deepCopy(mockTreeNotes);
         const mockNoteToBeInserted = deepCopy(mockNote);
+        mockNoteToBeInserted["path"] = "1;2";
 
         insertChildInLatestAndAtSpecifiedDepth(mockNotes, mockNoteToBeInserted, 1);
 
-        expect(mockNotes.children[1].children[2]).toBe(mockNoteToBeInserted);
+        expect(mockNotes.children[1].children[2]).toStrictEqual(mockNoteToBeInserted);
     });
 });
 
@@ -208,10 +211,11 @@ describe("insertSibilingAtSpecifiedDepth", () => {
     it("correctly inserts data at the right depth", () => {
         const mockNotes = deepCopy(mockTreeNotes);
         const mockNoteToBeInserted = deepCopy(mockNote);
+        mockNoteToBeInserted["path"] = "2";
 
         insertSibilingAtSpecifiedDepth(mockNotes, mockNoteToBeInserted, 1);
 
-        expect(mockNotes.children[2]).toBe(mockNoteToBeInserted);
+        expect(mockNotes.children[2]).toStrictEqual(mockNoteToBeInserted);
     });
 });
 
@@ -219,9 +223,10 @@ describe("insertChildren", () => {
     it("adds a child to the current node", () => {
         const mockNotes = deepCopy(mockTreeNotes);
         const mockNoteToBeInserted = deepCopy(mockNote);
+        mockNoteToBeInserted["path"] = "2";
 
         insertChildren(mockNotes, mockNoteToBeInserted);
 
-        expect(mockNotes.children[2]).toBe(mockNoteToBeInserted);
+        expect(mockNotes.children[2]).toStrictEqual(mockNoteToBeInserted);
     });
 });
