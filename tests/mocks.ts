@@ -224,8 +224,9 @@ export const mockHtml_table_image = /*html*/ `
         </tr>
     </tbody>
 </table>
-
 `;
+
+export const mockHtml = `<div class="test_html">${mockHtml_h1}${mockHtml_h2}${mockHtml_h3}${mockHtml_p1}${mockHtml_p2}${mockHtml_p3}${mockHtml_img}${mockHtml_table_image}</div>`;
 
 export const symbol_Symbol = /*html*/ `<span style="font-family: Symbol">Symbol text</span>`;
 export const symbol_Wingdings = /*html*/ `<span style="font-family: Wingdings">Symbol text</span>`;

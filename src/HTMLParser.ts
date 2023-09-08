@@ -6,9 +6,13 @@
 
 import {
     ImageDetail,
+    ImageNoteForm,
     Note,
     NoteForm,
     TableData,
+    TableNoteForm,
+    TextNote,
+    TextNoteForm,
     assertNever,
 } from "../types/types";
 
@@ -340,6 +344,33 @@ export function getElementData(element: HTMLElement) {
     assertNever();
 }
 
+/**
+ * Converts data returned from getElementData into data as Note format
+ * @param data
+ * @returns
+ */
+export function elementDataToNote(
+    data: string | ImageDetail[] | TableData
+): TextNoteForm | ImageNoteForm | TableNoteForm {
+    if (typeof data === "string") {
+        return {
+            text: data,
+            children: [],
+        };
+    } else if (Array.isArray(data) && data.every((e) => "src" in e)) {
+        // TODO: Check why data.every does not result in type narrowing
+        return {
+            images: data as ImageDetail[],
+            children: [],
+        };
+    }
+
+    return {
+        table: data,
+        children: [],
+    };
+}
+
 export function htmlToJS(html: HTMLElement[]) {
     const note: Note = {
         path: "",
@@ -348,14 +379,16 @@ export function htmlToJS(html: HTMLElement[]) {
 
     let previousDepth = 0;
     html.forEach((ele) => {
-        const elementDepth = getElementDepth(ele);
-
-        // if (elementDepth === previousDepth) {
-        //     insertSibilingInLatestAndDeepestDepths(note, {});
-        // } else if (elementDepth < previousDepth) {
-        //     insertSibilingAtSpecifiedDepth(note, {});
-        // } else if (elementDepth > previousDepth) {
-        //     insertChildInLatestAndDeepestDepths(note, {});
-        // }
+        let elementDepth = getElementDepth(ele) || previousDepth + 1;
+        const newNote = elementDataToNote(getElementData(ele));
+        if (elementDepth === previousDepth) {
+            insertSibilingInLatestAndDeepestDepths(note, newNote);
+        } else if (elementDepth < previousDepth) {
+            insertSibilingAtSpecifiedDepth(note, newNote, elementDepth);
+        } else if (elementDepth > previousDepth) {
+            insertChildInLatestAndDeepestDepths(note, newNote);
+        }
     });
+
+    return note;
 }

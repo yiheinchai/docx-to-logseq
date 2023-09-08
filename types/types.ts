@@ -4,8 +4,6 @@ export enum NoteType {
     TABLE = 3,
 }
 
-type MakeForm<T, U extends keyof T> = Pick<T, U>;
-
 export interface Note {
     path: string;
     children: (TextNote | ImageNote | TableNote)[];
@@ -32,7 +30,7 @@ export interface ImageNote extends Note {
 }
 
 export interface TableNote extends Note {
-    table_data: object;
+    table: object;
 }
 
 export type TextNoteForm = Omit<TextNote, "path">;

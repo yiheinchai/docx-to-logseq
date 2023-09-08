@@ -12,8 +12,11 @@ import {
     getElementDepth,
     getImageFromElement,
     getTableFromElement,
+    elementDataToNote,
+    htmlToJS,
 } from "../src/HTMLParser";
 import {
+    mockHtml,
     mockHtml_h1,
     mockHtml_h2,
     mockHtml_h3,
@@ -352,5 +355,157 @@ describe("getTableFromElement", () => {
         ]
 
         expect(table_detail).toStrictEqual(expectedTableDetail);
+    });
+});
+
+describe("elementDataToNote", () => {
+    it("is able to convert data to TextNote", () => {
+        const textNote = elementDataToNote("this is a text note");
+        expect(textNote).toStrictEqual({
+            text: "this is a text note",
+            children: [],
+        });
+    });
+
+    it("is able to convert data to ImageNote", () => {
+        const imageNote = elementDataToNote([
+            {
+                src: "test.png",
+                width: 420,
+                height: 69,
+            },
+            {
+                src: "test2.png",
+                width: 69,
+                height: 69,
+            },
+        ]);
+
+        expect(imageNote).toStrictEqual({
+            children: [],
+            images: [
+                {
+                    src: "test.png",
+                    width: 420,
+                    height: 69,
+                },
+                {
+                    src: "test2.png",
+                    width: 69,
+                    height: 69,
+                },
+            ],
+        });
+    });
+
+    it("is able to convert data to TableNote", () => {
+        const tableNote = elementDataToNote([
+            [["structure"], ["function"]],
+            [["myelination"], ["fast conduction"]],
+        ]);
+        expect(tableNote).toStrictEqual({
+            children: [],
+            table: [
+                [["structure"], ["function"]],
+                [["myelination"], ["fast conduction"]],
+            ],
+        });
+    });
+});
+
+describe("htmlToJS", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+    it("is able to convert htmlToJS with text, images, table", () => {
+        document.body.innerHTML = mockHtml;
+        const html_dom = document.querySelector(".test_html");
+
+        if (html_dom == null)
+            throw new Error("html dom mock is configured wrongly!");
+
+        const js_tree = htmlToJS(
+            Array.from(html_dom.children) as HTMLElement[]
+        );
+
+        console.log(JSON.stringify(js_tree));
+
+        expect(js_tree).toStrictEqual({
+            path: "",
+            children: [
+                {
+                    text: "Physiology: Renal",
+                    path: "0",
+                    children: [
+                        {
+                            text: "[037] Overview of Kidney Function",
+                            path: "0;0",
+                            children: [
+                                {
+                                    text: "Learning Outcomes",
+                                    path: "0;0;0",
+                                    children: [
+                                        {
+                                            text: "Macrostructure of Kidneys",
+                                            path: "0;0;0;0",
+                                            children: [
+                                                {
+                                                    text: "Structure and Function",
+                                                    path: "0;0;0;0;0",
+                                                    children: [
+                                                        {
+                                                            text: "Renal capsule – tough fibrinous membrane which protects and holds renal tissue together",
+                                                            path: "0;0;0;0;0;0",
+                                                            children: [
+                                                                {
+                                                                    images: [
+                                                                        {
+                                                                            src: "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png",
+                                                                            width: 139,
+                                                                            height: 114,
+                                                                        },
+                                                                    ],
+                                                                    path: "0;0;0;0;0;0;0",
+                                                                    children: [
+                                                                        {
+                                                                            table: [
+                                                                                [
+                                                                                    [
+                                                                                        "Foramen transversarium /",
+                                                                                        "Transverse foramen",
+                                                                                        [
+                                                                                            {
+                                                                                                src: "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png",
+                                                                                                width: 147,
+                                                                                                height: 111,
+                                                                                            },
+                                                                                        ],
+                                                                                    ],
+                                                                                    [
+                                                                                        "Stacked together to form a canal where arteries and veins pass through [thorax to brain]",
+                                                                                        "",
+                                                                                    ],
+                                                                                ],
+                                                                            ],
+                                                                            path: "0;0;0;0;0;0;0;0",
+                                                                            children:
+                                                                                [],
+                                                                        },
+                                                                    ],
+                                                                },
+                                                            ],
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        });
     });
 });
