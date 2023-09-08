@@ -288,8 +288,6 @@ const TABLE_CELL_ELEMENTS = ["p", "img"];
 export function getTableFromElement(tableElement: HTMLTableElement) {
     const tableData: TableData = Array.from(tableElement.rows).map((row) => {
         return Array.from(row.cells).map((cell) => {
-            console.log(Array.from(cell.childNodes).map((e) => e.nodeName));
-
             // Filter out the formating #text elements
             const cellNodes = Array.from(cell.childNodes).filter((node) =>
                 TABLE_CELL_ELEMENTS.includes(node.nodeName.toLowerCase())
