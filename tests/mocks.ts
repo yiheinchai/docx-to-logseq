@@ -18,6 +18,8 @@ export const mockHtml_p3 = /*html*/ `
         <span style="font-family: Wingdings">§<span style="font: 7pt 'Times New Roman'">&nbsp; </span></span>Renal capsule – tough fibrinous membrane which protects and holds renal tissue together
     </p>`;
 
+export const mockHtml_img = /*html*/ `<img width="139" height="114" class="yoloswag7" id="Picture 20598" src="MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png" alt="Diagram">`;
+
 export const symbol_Symbol = /*html*/ `<span style="font-family: Symbol">Symbol text</span>`;
 export const symbol_Wingdings = /*html*/ `<span style="font-family: Wingdings">Symbol text</span>`;
 export const symbol_CourierNew = /*html*/ `<span style="font-family: 'Courier New'">Symbol text</span>`;
