@@ -11,6 +11,7 @@ import {
     insertChildren,
     getElementDepth,
     getImageFromElement,
+    getTableFromElement,
 } from "../src/HTMLParser";
 import {
     mockHtml_h1,
@@ -20,6 +21,7 @@ import {
     mockHtml_p1,
     mockHtml_p2,
     mockHtml_p3,
+    mockHtml_table_text,
     mockNote,
     mockTreeNotes,
     symbol_CourierNew,
@@ -308,5 +310,31 @@ describe("getImageFromElement", () => {
             width: 139,
             height: 114,
         });
+    });
+});
+
+describe("getTableFromElement", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+    it("able get text data from table", () => {
+        document.body.innerHTML = mockHtml_table_text;
+        const table_element = document.querySelector("table");
+
+        if (table_element == null)
+            throw new Error("table element mock is configured wrongly!");
+
+        const table_detail = getTableFromElement(table_element);
+
+        // prettier-ignore
+        const expectedTableDetail = [
+            [['Structure'], ['Function']],
+            [['Polymorphonucleus – nucleus with many lobes'],['(not discovered)']],
+            [['Cytoplasm filled with granules'],['Granules with cytotoxic material to kill bacteria', 'Granule empty contents into phagosome upon phagocytosis of bacteria']]
+        ]
+
+        console.log(table_detail);
+
+        expect(table_detail).toStrictEqual(expectedTableDetail);
     });
 });

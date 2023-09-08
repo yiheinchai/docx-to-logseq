@@ -4,7 +4,13 @@
  * @returns JSON
  */
 
-import { ImageDetail, Note, NoteForm, assertNever } from "../types/types";
+import {
+    ImageDetail,
+    Note,
+    NoteForm,
+    TableData,
+    assertNever,
+} from "../types/types";
 
 /**
  * The following are helper functions which is meant to facilitate the building of the hierarchial JSON object
@@ -271,17 +277,46 @@ export function getImagesFromElements(imageElements: HTMLImageElement[]) {
     return imageElements.map((img) => getImageFromElement(img));
 }
 
-export function getTableFromElement(tableElement: HTMLTableElement) {}
+const TABLE_CELL_ELEMENTS = ["p", "img"];
+
+/**
+ * Extract table data from HTML table element
+ *
+ * @param tableElement
+ * @returns
+ */
+export function getTableFromElement(tableElement: HTMLTableElement) {
+    const tableData: TableData = Array.from(tableElement.rows).map((row) => {
+        return Array.from(row.cells).map((cell) => {
+            console.log(Array.from(cell.childNodes).map((e) => e.nodeName));
+
+            // Filter out the formating #text elements
+            const cellNodes = Array.from(cell.childNodes).filter((node) =>
+                TABLE_CELL_ELEMENTS.includes(node.nodeName.toLowerCase())
+            );
+
+            return cellNodes.map((ele) => {
+                return getElementData(ele as HTMLElement);
+            });
+        });
+    });
+
+    return tableData;
+}
 
 export function getElementData(element: HTMLElement) {
-    const tagName = element.localName;
+    const tagName = element.nodeName.toLowerCase();
 
     // For in paragraph elements
     if (tagName === "p") {
-        const tables = Array.from(element.querySelectorAll("table"));
+        // We expect only one table in a bullet point
+        const table = element.querySelector("table");
+
+        // there can be more than 1 image in a bullet point
         const images = Array.from(element.querySelectorAll("img"));
 
-        if (tables.length > 0) {
+        if (table) {
+            return getTableFromElement(table);
         } else if (images.length > 0) {
             return getImagesFromElements(images);
         } else {
@@ -291,11 +326,12 @@ export function getElementData(element: HTMLElement) {
 
     // For image elements not in paragraph
     if (tagName === "img") {
-        return getImageFromElement(element as HTMLImageElement);
+        return [getImageFromElement(element as HTMLImageElement)];
     }
 
     // For table elements not in paragraph
     if (tagName === "table") {
+        return getTableFromElement(element as HTMLTableElement);
     }
 
     // For heading elements

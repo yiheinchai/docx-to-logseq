@@ -20,6 +20,13 @@ export interface ImageDetail {
     width: number;
     height: number;
 }
+
+export type TableCell = (ImageDetail[] | string | TableData)[];
+
+export type TableRow = TableCell[];
+
+export type TableData = TableRow[];
+
 export interface ImageNote extends Note {
     images: ImageDetail[];
 }

@@ -19,6 +19,136 @@ export const mockHtml_p3 = /*html*/ `
     </p>`;
 
 export const mockHtml_img = /*html*/ `<img width="139" height="114" class="yoloswag7" id="Picture 20598" src="MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png" alt="Diagram">`;
+export const mockHtml_table_text = /*html*/ `
+    <table
+        class="MsoTableGrid"
+        border="1"
+        cellspacing="0"
+        cellpadding="0"
+        style="margin-left: 108pt; border-collapse: collapse; border: none"
+    >
+        <tbody>
+            <tr>
+                <td
+                    width="236"
+                    valign="top"
+                    style="
+                        width: 177pt;
+                        border: solid windowtext 1pt;
+                        background: #bfbfbf;
+                        padding: 0cm 5.4pt 0cm 5.4pt;
+                    "
+                >
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >
+                        <span style="color: black">Structure</span>
+                    </p>
+                </td>
+                <td
+                    width="221"
+                    valign="top"
+                    style="
+                        width: 165.8pt;
+                        border: solid windowtext 1pt;
+                        border-left: none;
+                        background: #bfbfbf;
+                        padding: 0cm 5.4pt 0cm 5.4pt;
+                    "
+                >
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >
+                        <span style="color: black">Function</span>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td
+                    width="236"
+                    valign="top"
+                    style="
+                        width: 177pt;
+                        border: solid windowtext 1pt;
+                        border-top: none;
+                        padding: 0cm 5.4pt 0cm 5.4pt;
+                    "
+                >
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >
+                        Polymorphonucleus – nucleus with many lobes
+                    </p>
+                </td>
+                <td
+                    width="221"
+                    valign="top"
+                    style="
+                        width: 165.8pt;
+                        border-top: none;
+                        border-left: none;
+                        border-bottom: solid windowtext 1pt;
+                        border-right: solid windowtext 1pt;
+                        padding: 0cm 5.4pt 0cm 5.4pt;
+                    "
+                >
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >
+                        (not discovered)
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td
+                    width="236"
+                    valign="top"
+                    style="
+                        width: 177pt;
+                        border: solid windowtext 1pt;
+                        border-top: none;
+                        padding: 0cm 5.4pt 0cm 5.4pt;
+                    "
+                >
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >
+                        Cytoplasm filled with granules
+                    </p>
+                </td>
+                <td
+                    width="221"
+                    valign="top"
+                    style="
+                        width: 165.8pt;
+                        border-top: none;
+                        border-left: none;
+                        border-bottom: solid windowtext 1pt;
+                        border-right: solid windowtext 1pt;
+                        padding: 0cm 5.4pt 0cm 5.4pt;
+                    "
+                >
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >
+                        Granules with cytotoxic material to kill bacteria
+                    </p>
+                    <p
+                        class="MsoNormal"
+                        style="margin-bottom: 0cm; line-height: normal"
+                    >Granule empty contents into phagosome upon phagocytosis of bacteria
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    `;
 
 export const symbol_Symbol = /*html*/ `<span style="font-family: Symbol">Symbol text</span>`;
 export const symbol_Wingdings = /*html*/ `<span style="font-family: Wingdings">Symbol text</span>`;
