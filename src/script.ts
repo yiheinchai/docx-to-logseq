@@ -1,20 +1,24 @@
 import { htmlToJS } from "./HTMLParser";
 
-function handleFileSelect(event) {
+function handleFileSelect(event: Event) {
     // Get the selected file from the input element
-    const file = event.target.files[0];
+    const file = (event.target as HTMLInputElement).files[0];
     // Check if the file is a HTML file
     if (file.type === "text/html") {
         // Display the file name on the page
         document.getElementById("file-name").textContent = file.name;
         // Enable the convert button
-        document.getElementById("convert-button").disabled = false;
+        (
+            document.getElementById("convert-button") as HTMLButtonElement
+        ).disabled = false;
     } else {
         // Display an error message on the page
         document.getElementById("file-name").textContent =
             "Please select a valid HTML file.";
         // Disable the convert button
-        document.getElementById("convert-button").disabled = true;
+        (
+            document.getElementById("convert-button") as HTMLButtonElement
+        ).disabled = true;
     }
 }
 
