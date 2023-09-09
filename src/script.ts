@@ -21,13 +21,14 @@ function handleFileSelect(event) {
 // This function converts the HTML file to JSON and creates a download link
 function convertFile() {
     // Get the selected file from the input element
-    const file = document.getElementById("file-input").files[0];
+    const file = (document.getElementById("file-input") as HTMLInputElement)
+        .files[0];
     // Create a file reader object
     const reader = new FileReader();
     // Define a callback function for when the file is loaded
     reader.onload = function (event) {
         // Get the file content as a string
-        const html = event.target.result;
+        const html = event.target.result as string;
         // Parse the HTML string into a DOM tree
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
@@ -40,7 +41,9 @@ function convertFile() {
         // Create a URL for the blob object
         const url = URL.createObjectURL(blob);
         // Get the download link element from the page
-        const link = document.getElementById("download-link");
+        const link = document.getElementById(
+            "download-link"
+        ) as HTMLAnchorElement;
         // Set the href attribute of the link to the blob URL
         link.href = url;
         // Set the download attribute of the link to the file name with .json extension
@@ -59,13 +62,17 @@ function domToJson(html) {
 }
 
 function hydrateButtons() {
-    const convertButton = document.querySelector("#convert-button");
+    const convertButton = document.querySelector(
+        "#convert-button"
+    ) as HTMLElement;
     convertButton.onclick = convertFile;
 
-    const fileInput = document.querySelector("#file-input");
+    const fileInput = document.querySelector("#file-input") as HTMLElement;
     fileInput.onchange = handleFileSelect;
 
-    const downloadLink = document.querySelector("#download-link");
+    const downloadLink = document.querySelector(
+        "#download-link"
+    ) as HTMLElement;
     downloadLink.onclick = () => downloadLink.classList.add("hidden");
 }
 

@@ -14,6 +14,7 @@ import {
     getTableFromElement,
     elementDataToNote,
     htmlToJS,
+    formatSrcLink,
 } from "../src/HTMLParser";
 import {
     mockHtml,
@@ -305,6 +306,17 @@ describe("getElementDepth", () => {
         const level = getElementDepth(p3_element);
 
         expect(level).toBe(7);
+    });
+});
+
+describe("formatSrcLink", () => {
+    it("is able to format src link", () => {
+        const src =
+            "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png";
+        const formattedSrc = formatSrcLink(src);
+        expect(formattedSrc).toBe(
+            "./MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png"
+        );
     });
 });
 
