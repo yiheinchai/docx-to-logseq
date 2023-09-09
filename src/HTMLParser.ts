@@ -176,18 +176,19 @@ export function pathToString(path: number[]) {
 const TEXT_TAGS = ["p", "h1", "h2", "h3"];
 
 const elementDepthMapping = {
-    h1: 1,
-    h2: 2,
-    h3: 3,
+    MsoTitle: 1,
+    h1: 2,
+    h2: 3,
+    h3: 4,
     p: {
-        "": 4,
-        "72pt": 5,
-        "108pt": 6,
-        "144pt": 7,
-        "180pt": 8,
-        "216pt": 9,
-        "254pt": 10,
-        "290pt": 11,
+        "": 5,
+        "72pt": 6,
+        "108pt": 7,
+        "144pt": 8,
+        "180pt": 9,
+        "216pt": 10,
+        "254pt": 11,
+        "290pt": 12,
     },
 };
 
@@ -201,6 +202,10 @@ const elementDepthMapping = {
 export function getElementDepth(element: HTMLElement) {
     const tagName = element.localName;
 
+    if (element.className in elementDepthMapping) {
+        return elementDepthMapping[element.className];
+    }
+
     if (tagName === "p") {
         // p tag margin is used to determine the level in the hierarchy
         const elementMargins = element.style.marginLeft;
@@ -212,7 +217,12 @@ export function getElementDepth(element: HTMLElement) {
 
 // DATA EXTRACTORS
 
-const SYMBOL_FONT_FAMILIES = ["Symbol", "Wingdings", "'Courier New'"];
+const SYMBOL_FONT_FAMILIES = [
+    "Symbol",
+    "Wingdings",
+    '"Courier New"',
+    "'Courier New'",
+];
 
 /**
  * Removes non-breaking space in some of the extracted text of the text nodes and removes newlines
@@ -244,6 +254,9 @@ export function checkIfSymbol(element: Node | HTMLElement) {
  * Text content is often embbeded in span, sub, a elements within the p, H1, H2, H3 elements.
  * This function extracts the core text, while ignoring bullet point styling elements
  */
+
+const TEXT_CHILD_ELEMENTS = ["span", "sub", "a", "#text"];
+
 export function getTextFromElement(currentElement: HTMLElement) {
     const childNodes = Array.from(currentElement.childNodes);
 
@@ -251,7 +264,7 @@ export function getTextFromElement(currentElement: HTMLElement) {
         // Guard clause to prevent parsing bullet points (bullet points have font family set)
         if (checkIfSymbol(node)) return texts;
 
-        if (node.textContent != null) {
+        if (node.textContent) {
             texts.push(node.textContent);
             return texts;
         }
@@ -326,6 +339,13 @@ export function getElementData(element: HTMLElement) {
         }
     }
 
+    if (tagName === "div") {
+        const table = element.querySelector("table");
+        if (table) {
+            return getTableFromElement(table);
+        }
+    }
+
     // For image elements not in paragraph
     if (tagName === "img") {
         return [getImageFromElement(element as HTMLImageElement)];
@@ -341,7 +361,13 @@ export function getElementData(element: HTMLElement) {
         return getTextFromElement(element);
     }
 
-    assertNever();
+    console.log(
+        "Unrecognized element: ",
+        element,
+        element.nodeName,
+        element.className
+    );
+    // assertNever();
 }
 
 /**
@@ -377,9 +403,9 @@ export function htmlToJS(html: HTMLElement[]) {
         children: [],
     };
 
-    let previousDepth = 0;
-    html.forEach((ele) => {
-        let elementDepth = getElementDepth(ele) || previousDepth + 1;
+    let previousDepth = -1;
+    html.forEach((ele, i) => {
+        let elementDepth = getElementDepth(ele) ?? previousDepth + 1;
         const newNote = elementDataToNote(getElementData(ele));
         if (elementDepth === previousDepth) {
             insertSibilingInLatestAndDeepestDepths(note, newNote);
@@ -388,6 +414,8 @@ export function htmlToJS(html: HTMLElement[]) {
         } else if (elementDepth > previousDepth) {
             insertChildInLatestAndDeepestDepths(note, newNote);
         }
+
+        previousDepth = elementDepth;
     });
 
     return note;

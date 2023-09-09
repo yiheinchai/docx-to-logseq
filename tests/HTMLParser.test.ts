@@ -17,12 +17,14 @@ import {
 } from "../src/HTMLParser";
 import {
     mockHtml,
+    mockHtml2,
     mockHtml_h1,
     mockHtml_h2,
     mockHtml_h3,
     mockHtml_img,
     mockHtml_p1,
     mockHtml_p2,
+    mockHtml_p2_2,
     mockHtml_p3,
     mockHtml_table_image,
     mockHtml_table_text,
@@ -99,6 +101,18 @@ describe("getTextFromElement", () => {
 
             const text = getTextFromElement(p2_element);
             expect(text).toBe("Structure and Function");
+        });
+        test("p2 bullet element", () => {
+            document.body.innerHTML = mockHtml_p2_2;
+            const p2_element = document.querySelector("p");
+
+            if (p2_element == null)
+                throw new Error("p2 element mock is configured wrongly!");
+
+            const text = getTextFromElement(p2_element);
+            expect(text).toBe(
+                "The central dogma of molecular biology describes the flow of genetic information from DNA to RNA to Proteins"
+            );
         });
         test("p3 element", () => {
             document.body.innerHTML = mockHtml_p3;
@@ -278,7 +292,7 @@ describe("getElementDepth", () => {
 
         const level = getElementDepth(h1_element);
 
-        expect(level).toBe(1);
+        expect(level).toBe(2);
     });
 
     it("is able to get depth of p tags", () => {
@@ -290,7 +304,7 @@ describe("getElementDepth", () => {
 
         const level = getElementDepth(p3_element);
 
-        expect(level).toBe(6);
+        expect(level).toBe(7);
     });
 });
 
@@ -428,8 +442,6 @@ describe("htmlToJS", () => {
             Array.from(html_dom.children) as HTMLElement[]
         );
 
-        console.log(JSON.stringify(js_tree));
-
         expect(js_tree).toStrictEqual({
             path: "",
             children: [
@@ -492,6 +504,106 @@ describe("htmlToJS", () => {
                                                                                 [],
                                                                         },
                                                                     ],
+                                                                },
+                                                            ],
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        });
+    });
+    it("is able to convert a real worldhtmlToJS", () => {
+        document.body.innerHTML = mockHtml2;
+        const html_dom = document.querySelector(".test_html");
+
+        if (html_dom == null)
+            throw new Error("html dom mock is configured wrongly!");
+
+        const js_tree = htmlToJS(
+            Array.from(html_dom.children) as HTMLElement[]
+        );
+
+        expect(js_tree).toStrictEqual({
+            path: "",
+            children: [
+                {
+                    text: "FHMP",
+                    path: "0",
+                    children: [
+                        {
+                            text: "Molecular Biology",
+                            path: "0;0",
+                            children: [
+                                {
+                                    text: "[002] DNA Structure and Replication",
+                                    path: "0;0;0",
+                                    children: [
+                                        {
+                                            text: "Central Dogma of Molecular Biology",
+                                            path: "0;0;0;0",
+                                            children: [
+                                                {
+                                                    text: "Definition",
+                                                    path: "0;0;0;0;0",
+                                                    children: [
+                                                        {
+                                                            text: "The central dogma of molecular biology describes the flow of genetic information from DNA to RNA to Proteins",
+                                                            path: "0;0;0;0;0;0",
+                                                            children: [],
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            text: "Three Domains of Life",
+                                            path: "0;0;0;1",
+                                            children: [
+                                                {
+                                                    text: "Three Domains of Life",
+                                                    path: "0;0;0;1;0",
+                                                    children: [
+                                                        {
+                                                            path: "0;0;0;1;0;0",
+                                                            children: [],
+                                                            table: [
+                                                                // prettier-ignore
+                                                                [["Bacteria"], ['Archaea'], ['Eukarya']],
+                                                                // prettier-ignore
+                                                                [['Same Prokaryotic cellular architecture'], [""]],
+                                                                // prettier-ignore
+                                                                [[''], ['Same molecular architecture', 'Similar enzymes – RNA polymerase']],
+                                                            ],
+                                                        },
+                                                    ],
+                                                },
+                                                {
+                                                    text: "Archaea",
+                                                    path: "0;0;0;1;1",
+                                                    children: [
+                                                        {
+                                                            text: "Property: Living in extreme environments",
+                                                            path: "0;0;0;1;1;0",
+                                                            children: [
+                                                                {
+                                                                    path: "0;0;0;1;1;0;0",
+                                                                    children:
+                                                                        [],
+                                                                    text: "Cryophilic – able to live in cold environments",
+                                                                },
+                                                                {
+                                                                    path: "0;0;0;1;1;0;1",
+                                                                    children:
+                                                                        [],
+                                                                    text: "Acidophilic – able to live highly acidic environments",
                                                                 },
                                                             ],
                                                         },
