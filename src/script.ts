@@ -1,4 +1,5 @@
 import { htmlToJS } from "./HTMLParser";
+import { noteToLogseq } from "./LogseqParser";
 
 function handleFileSelect(event: Event) {
     // Get the selected file from the input element
@@ -38,12 +39,28 @@ function convertFile() {
         const doc = parser.parseFromString(html, "text/html");
         // Convert the DOM tree to a JSON object
         const json = domToJson(doc);
-        // Convert the JSON object to a string
-        const jsonString = JSON.stringify(json, null, 2);
-        // Create a blob object from the JSON string
-        const blob = new Blob([jsonString], { type: "application/json" });
+        // // Convert the JSON object to a string
+        // const jsonString = JSON.stringify(json, null, 2);
+        // // Create a blob object from the JSON string
+        // // const blob = new Blob([jsonString], { type: "application/json" });
+        // const jsonBlob = new Blob([jsonString], { type: "application/json" });
+        // // Create a URL for the blob object
+        // const url = URL.createObjectURL(jsonBlob);
+        // // Get the download link element from the page
+        // const link = document.getElementById(
+        //     "download-link"
+        // ) as HTMLAnchorElement;
+        // // Set the href attribute of the link to the blob URL
+        // link.href = url;
+        // // Set the download attribute of the link to the file name with .json extension
+        // link.download = file.name.replace(".html", ".json");
+        // // Show the download link on the page
+        // link.classList.remove("hidden");
+
+        const logseqNote = noteToLogseq(json);
+        const logseqBlob = new Blob([logseqNote], { type: "text/plain" });
         // Create a URL for the blob object
-        const url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(logseqBlob);
         // Get the download link element from the page
         const link = document.getElementById(
             "download-link"
@@ -51,7 +68,7 @@ function convertFile() {
         // Set the href attribute of the link to the blob URL
         link.href = url;
         // Set the download attribute of the link to the file name with .json extension
-        link.download = file.name.replace(".html", ".json");
+        link.download = file.name.replace(".html", ".md");
         // Show the download link on the page
         link.classList.remove("hidden");
     };

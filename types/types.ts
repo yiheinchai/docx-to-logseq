@@ -30,7 +30,7 @@ export interface ImageNote extends Note {
 }
 
 export interface TableNote extends Note {
-    table: object;
+    table: TableData;
 }
 
 export type TextNoteForm = Omit<TextNote, "path">;

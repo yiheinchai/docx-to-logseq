@@ -231,7 +231,8 @@ const SYMBOL_FONT_FAMILIES = [
  */
 export function cleanText(text: string) {
     const noBreakingSpaces = text.replace(/\u00A0/g, "");
-    const noNewLines = noBreakingSpaces.trim();
+    const noSideSpaces = noBreakingSpaces.trim();
+    const noNewLines = noSideSpaces.replace(/\n/g, " ");
 
     return noNewLines;
 }
@@ -389,10 +390,13 @@ export function elementDataToNote(
             text: data,
             children: [],
         };
-    } else if (Array.isArray(data) && data.every((e) => "src" in e)) {
+    } else if (
+        Array.isArray(data) &&
+        data.every((e): e is ImageDetail => "src" in e)
+    ) {
         // TODO: Check why data.every does not result in type narrowing
         return {
-            images: data as ImageDetail[],
+            images: data,
             children: [],
         };
     }
