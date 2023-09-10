@@ -386,28 +386,36 @@ describe("getTableFromElement", () => {
 
 describe("elementDataToNote", () => {
     it("is able to convert data to TextNote", () => {
-        const textNote = elementDataToNote("this is a text note");
+        const textNote = elementDataToNote(
+            "this is a text note",
+            "<p>test</p>"
+        );
         expect(textNote).toStrictEqual({
             text: "this is a text note",
+            html: "<p>test</p>",
             children: [],
         });
     });
 
     it("is able to convert data to ImageNote", () => {
-        const imageNote = elementDataToNote([
-            {
-                src: "test.png",
-                width: 420,
-                height: 69,
-            },
-            {
-                src: "test2.png",
-                width: 69,
-                height: 69,
-            },
-        ]);
+        const imageNote = elementDataToNote(
+            [
+                {
+                    src: "test.png",
+                    width: 420,
+                    height: 69,
+                },
+                {
+                    src: "test2.png",
+                    width: 69,
+                    height: 69,
+                },
+            ],
+            "<p>test</p>"
+        );
 
         expect(imageNote).toStrictEqual({
+            html: "<p>test</p>",
             children: [],
             images: [
                 {
@@ -425,11 +433,15 @@ describe("elementDataToNote", () => {
     });
 
     it("is able to convert data to TableNote", () => {
-        const tableNote = elementDataToNote([
-            [["structure"], ["function"]],
-            [["myelination"], ["fast conduction"]],
-        ]);
+        const tableNote = elementDataToNote(
+            [
+                [["structure"], ["function"]],
+                [["myelination"], ["fast conduction"]],
+            ],
+            "<p>test</p>"
+        );
         expect(tableNote).toStrictEqual({
+            html: "<p>test</p>",
             children: [],
             table: [
                 [["structure"], ["function"]],
@@ -460,26 +472,32 @@ describe("htmlToJS", () => {
                 {
                     text: "Physiology: Renal",
                     path: "0",
+                    html: mockHtml_h1,
                     children: [
                         {
                             text: "[037] Overview of Kidney Function",
                             path: "0;0",
+                            html: mockHtml_h2,
                             children: [
                                 {
                                     text: "Learning Outcomes",
                                     path: "0;0;0",
+                                    html: mockHtml_h3,
                                     children: [
                                         {
                                             text: "Macrostructure of Kidneys",
                                             path: "0;0;0;0",
+                                            html: mockHtml_p1,
                                             children: [
                                                 {
                                                     text: "Structure and Function",
                                                     path: "0;0;0;0;0",
+                                                    html: mockHtml_p2,
                                                     children: [
                                                         {
                                                             text: "Renal capsule – tough fibrinous membrane which protects and holds renal tissue together",
                                                             path: "0;0;0;0;0;0",
+                                                            html: mockHtml_p3,
                                                             children: [
                                                                 {
                                                                     images: [
@@ -490,6 +508,7 @@ describe("htmlToJS", () => {
                                                                         },
                                                                     ],
                                                                     path: "0;0;0;0;0;0;0",
+                                                                    html: mockHtml_img,
                                                                     children: [
                                                                         {
                                                                             table: [
@@ -512,6 +531,7 @@ describe("htmlToJS", () => {
                                                                                 ],
                                                                             ],
                                                                             path: "0;0;0;0;0;0;0;0",
+                                                                            html: mockHtml_table_image,
                                                                             children:
                                                                                 [],
                                                                         },
@@ -549,26 +569,32 @@ describe("htmlToJS", () => {
                 {
                     text: "FHMP",
                     path: "0",
+                    html: '<p class="MsoTitle"> <a name="_Toc95808416"></a><a name="_Toc102616402"><span lang="EN-US">FHMP</span></a> </p>',
                     children: [
                         {
                             text: "Molecular Biology",
                             path: "0;0",
+                            html: '<h1><span lang="EN-US">Molecular Biology</span></h1>',
                             children: [
                                 {
                                     text: "[002] DNA Structure and Replication",
                                     path: "0;0;0",
+                                    html: '<h2> <a name="_Toc86689177"></a><a name="_Toc95808417"></a><a name="_Toc102616403"><span lang="EN-US">[002] DNA Structure and Replication</span></a> </h2>',
                                     children: [
                                         {
                                             text: "Central Dogma of Molecular Biology",
                                             path: "0;0;0;0",
+                                            html: '<h3> <a name="_Toc86689178"><span lang="EN-US">Central Dogma of Molecular Biology</span></a> </h3>',
                                             children: [
                                                 {
                                                     text: "Definition",
                                                     path: "0;0;0;0;0",
+                                                    html: '<p class="MsoListParagraph" style="text-indent: -18pt"> <span lang="EN-US" style="font-family: Symbol">·<span style="font: 7pt \'Times New Roman\'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span lang="EN-US">Definition</span> </p>',
                                                     children: [
                                                         {
                                                             text: "The central dogma of molecular biology describes the flow of genetic information from DNA to RNA to Proteins",
                                                             path: "0;0;0;0;0;0",
+                                                            html: '<p class="MsoListParagraph" style="margin-left: 72pt; text-indent: -18pt"> <span lang="EN-US" style="font-family: &quot;Courier New&quot;">o<span style="font: 7pt \'Times New Roman\'">&nbsp;&nbsp; </span></span><span lang="EN-US">The central dogma of molecular biology describes the flow of genetic information from DNA to RNA to Proteins</span> </p>',
                                                             children: [],
                                                         },
                                                     ],
@@ -578,13 +604,16 @@ describe("htmlToJS", () => {
                                         {
                                             text: "Three Domains of Life",
                                             path: "0;0;0;1",
+                                            html: '<h3> <a name="_Toc86689179"><span lang="EN-US">Three Domains of Life</span></a> </h3>',
                                             children: [
                                                 {
                                                     text: "Three Domains of Life",
                                                     path: "0;0;0;1;0",
+                                                    html: '<p class="MsoListParagraph" style="text-indent: -18pt"> <span lang="EN-US" style="font-family: Symbol">·<span style="font: 7pt \'Times New Roman\'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span lang="EN-US">Three Domains of Life</span> </p>',
                                                     children: [
                                                         {
                                                             path: "0;0;0;1;0;0",
+                                                            html: '<table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" style=" margin-left: 72pt; border-collapse: collapse; border: none; "> <tbody><tr> <td width="173" valign="top" style=" width: 129.6pt; border: solid windowtext 1pt; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">Bacteria</span> </p></td><td width="174" valign="top" style=" width: 130.25pt; border: solid windowtext 1pt; border-left: none; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">Archaea</span> </p></td><td width="174" valign="top" style=" width: 130.25pt; border: solid windowtext 1pt; border-left: none; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">Eukarya</span> </p></td></tr><tr> <td width="346" colspan="2" valign="top" style=" width: 259.85pt; border: solid windowtext 1pt; border-top: none; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">Same Prokaryotic cellular architecture</span> </p></td><td width="174" valign="top" style=" width: 130.25pt; border-top: none; border-left: none; border-bottom: solid windowtext 1pt; border-right: solid windowtext 1pt; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">&nbsp;</span> </p></td></tr><tr> <td width="173" valign="top" style=" width: 129.6pt; border: solid windowtext 1pt; border-top: none; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">&nbsp;</span> </p></td><td width="347" colspan="2" valign="top" style=" width: 260.5pt; border-top: none; border-left: none; border-bottom: solid windowtext 1pt; border-right: solid windowtext 1pt; padding: 0cm 5.4pt 0cm 5.4pt; "> <p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">Same molecular architecture</span> </p><p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal"> <span lang="EN-US">Similar enzymes – RNA polymerase</span> </p></td></tr></tbody></table>',
                                                             children: [],
                                                             table: [
                                                                 // prettier-ignore
@@ -600,19 +629,23 @@ describe("htmlToJS", () => {
                                                 {
                                                     text: "Archaea",
                                                     path: "0;0;0;1;1",
+                                                    html: '<p class="MsoListParagraph" style="text-indent: -18pt"> <span lang="EN-US" style="font-family: Symbol">·<span style="font: 7pt \'Times New Roman\'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span lang="EN-US">Archaea</span> </p>',
                                                     children: [
                                                         {
                                                             text: "Property: Living in extreme environments",
                                                             path: "0;0;0;1;1;0",
+                                                            html: '<p class="MsoListParagraph" style="margin-left: 72pt; text-indent: -18pt"> <span lang="EN-US" style="font-family: &quot;Courier New&quot;">o<span style="font: 7pt \'Times New Roman\'">&nbsp;&nbsp; </span></span><span lang="EN-US">Property: Living in extreme environments</span> </p>',
                                                             children: [
                                                                 {
                                                                     path: "0;0;0;1;1;0;0",
+                                                                    html: '<p class="MsoListParagraph" style="margin-left: 108pt; text-indent: -18pt"> <span lang="EN-US" style="font-family: Wingdings">§<span style="font: 7pt \'Times New Roman\'">&nbsp; </span></span><span lang="EN-US">Cryophilic – able to live in cold environments</span> </p>',
                                                                     children:
                                                                         [],
                                                                     text: "Cryophilic – able to live in cold environments",
                                                                 },
                                                                 {
                                                                     path: "0;0;0;1;1;0;1",
+                                                                    html: '<p class="MsoListParagraph" style="margin-left: 108pt; text-indent: -18pt"> <span lang="EN-US" style="font-family: Wingdings">§<span style="font: 7pt \'Times New Roman\'">&nbsp; </span></span><span lang="EN-US">Acidophilic – able to live highly acidic environments</span> </p>',
                                                                     children:
                                                                         [],
                                                                     text: "Acidophilic – able to live highly acidic environments",

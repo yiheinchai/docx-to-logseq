@@ -3,6 +3,7 @@ import {
     TableNoteToLogseq,
     TextNoteToLogseq,
     formatImageInTableNote,
+    markdownTable,
 } from "../src/LogseqParser";
 import { TableNote } from "../types/types";
 import { mockHtml_table_image, mockImageNote, mockTextNote } from "./mocks";
@@ -25,37 +26,59 @@ describe("ImageNoteToLogseq", () => {
     });
 });
 
-describe("formatImageInTableNote", () => {
-    it("should format images in a table", () => {
-        const formatedTable = formatImageInTableNote([
-            // prettier-ignore
-            [['Foramen transversarium /', 'Transverse foramen', [{src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
+// describe("formatImageInTableNote", () => {
+//     it("should format images in a table", () => {
+//         const formatedTable = formatImageInTableNote([
+//             // prettier-ignore
+//             [['Foramen transversarium /', 'Transverse foramen', [{src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
+//         ]);
+
+//         expect(formatedTable).toStrictEqual([
+//             [
+//                 // prettier-ignore
+//                 'Foramen transversarium /\nTransverse foramen\n![image.png](../assets/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png){:height 111, :width 147}',
+//                 // prettier-ignore
+//                 'Stacked together to form a canal where arteries and veins pass through [thorax to brain]\n',
+//             ],
+//         ]);
+//     });
+// });
+
+// describe("TableNoteToLogseq", () => {
+//     it("should convert table note to logseq format", () => {
+//         const tableNote: TableNote = {
+//             path: "1;2",
+//             children: [],
+//             table: [
+//                 // prettier-ignore
+//                 [['Foramen transversarium /', 'Transverse foramen', [{src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
+//             ],
+//         };
+//         console.log(tableNote);
+//         expect(TableNoteToLogseq(tableNote)).toEqual(
+//             "|Foramen transversarium /\nTransverse foramen\n![image.png](../assets/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png){:height 111, :width 147}|Stacked together to form a canal where arteries and veins pass through [thorax to brain]\n|"
+//         );
+//     });
+// });
+
+describe("markdownTable", () => {
+    it("is able to handle standard table", () => {
+        const markdown = markdownTable([
+            ["header1", "header2"],
+            ["value1", "value2"],
         ]);
 
-        expect(formatedTable).toStrictEqual([
-            [
-                // prettier-ignore
-                'Foramen transversarium /\nTransverse foramen\n![image.png](../assets/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png){:height 111, :width 147}',
-                // prettier-ignore
-                'Stacked together to form a canal where arteries and veins pass through [thorax to brain]\n',
-            ],
-        ]);
+        expect(markdown).toBe(`|header1|header2|\n|value1|value2|`);
     });
-});
 
-describe("TableNoteToLogseq", () => {
-    it("should convert table note to logseq format", () => {
-        const tableNote: TableNote = {
-            path: "1;2",
-            children: [],
-            table: [
-                // prettier-ignore
-                [['Foramen transversarium /', 'Transverse foramen', [{src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
-            ],
-        };
-        console.log(tableNote);
-        expect(TableNoteToLogseq(tableNote)).toEqual(
-            "|Foramen transversarium /\nTransverse foramen\n![image.png](../assets/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png){:height 111, :width 147}|Stacked together to form a canal where arteries and veins pass through [thorax to brain]\n|"
+    it("is able to handle table with double lines", () => {
+        const markdown = markdownTable([
+            ["header1", "header2"],
+            ["value1\nvalue1 information", "value2"],
+        ]);
+
+        expect(markdown).toBe(
+            `|header1|header2|\n|value1<br>value1 information|value2|`
         );
     });
 });

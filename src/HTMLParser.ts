@@ -368,13 +368,26 @@ export function getElementData(element: HTMLElement) {
         return getTextFromElement(element);
     }
 
+    // TODO: Possible way to refactor this
+    // A map of element types to corresponding functions
+    // const elementFunctions = new Map<string, Function>([
+    //     ["table", getTableFromElement],
+    //     ["img", getImageFromElement],
+    //     ["p", getTextFromParagraph],
+    //     ["div", getDataFromDiv],
+    // ]);
+
     console.log(
         "Unrecognized element: ",
         element,
         element.nodeName,
         element.className
     );
-    // assertNever();
+    assertNever();
+}
+
+export function getElementHtml(ele: HTMLElement) {
+    return ele.outerHTML;
 }
 
 /**
@@ -383,12 +396,14 @@ export function getElementData(element: HTMLElement) {
  * @returns
  */
 export function elementDataToNote(
-    data: string | ImageDetail[] | TableData
+    data: string | ImageDetail[] | TableData,
+    html: string
 ): TextNoteForm | ImageNoteForm | TableNoteForm {
     if (typeof data === "string") {
         return {
             text: data,
             children: [],
+            html,
         };
     } else if (
         Array.isArray(data) &&
@@ -398,12 +413,14 @@ export function elementDataToNote(
         return {
             images: data,
             children: [],
+            html,
         };
     }
 
     return {
         table: data,
         children: [],
+        html,
     };
 }
 
@@ -416,7 +433,10 @@ export function htmlToJS(html: HTMLElement[]) {
     let previousDepth = -1;
     html.forEach((ele, i) => {
         let elementDepth = getElementDepth(ele) ?? previousDepth + 1;
-        const newNote = elementDataToNote(getElementData(ele));
+        const newNote = elementDataToNote(
+            getElementData(ele),
+            getElementHtml(ele)
+        );
         if (elementDepth === previousDepth) {
             insertSibilingInLatestAndDeepestDepths(note, newNote);
         } else if (elementDepth < previousDepth) {

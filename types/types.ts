@@ -11,6 +11,7 @@ export interface Note {
 
 export interface TextNote extends Note {
     text: string;
+    html: string;
 }
 
 export interface ImageDetail {
@@ -25,12 +26,16 @@ export type TableRow = TableCell[];
 
 export type TableData = TableRow[];
 
+export type twoDimTable = string[][];
+
 export interface ImageNote extends Note {
     images: ImageDetail[];
+    html: string;
 }
 
 export interface TableNote extends Note {
     table: TableData;
+    html: string;
 }
 
 export type TextNoteForm = Omit<TextNote, "path">;
@@ -38,6 +43,11 @@ export type ImageNoteForm = Omit<ImageNote, "path">;
 export type TableNoteForm = Omit<TableNote, "path">;
 
 export type NoteForm = TextNoteForm | ImageNoteForm | TableNoteForm;
+
+export type LogseqPage = {
+    pageTitle: string;
+    pageContent: string;
+};
 
 export function assertNever(): never {
     throw new Error(

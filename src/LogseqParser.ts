@@ -1,4 +1,3 @@
-import { markdownTable } from "markdown-table";
 import {
     ImageDetail,
     ImageNote,
@@ -6,6 +5,8 @@ import {
     TableData,
     TableNote,
     TextNote,
+    assertNever,
+    twoDimTable,
 } from "../types/types";
 
 const LOGSEQ_TAB = "\t";
@@ -55,34 +56,55 @@ export function ImageNoteToLogseq(imageNote: ImageNote) {
  * @param table
  * @returns
  */
-export function formatImageInTableNote(table: TableData) {
+export function formatImageInTableNote(table: TableData): twoDimTable {
     return table.map((row) => {
         return row.map((cell) => {
-            const cellItems: string[] | TableData = cell.map((cellItem) => {
-                if (typeof cellItem === "string") {
-                    // Don't do anything for text
-                    return cellItem;
-                } else if (
-                    // * This is the way to do type narrow with arrays
-                    cellItem.every((item): item is ImageDetail => "src" in item)
-                ) {
-                    // Format images to logseq markdown syntax
-                    return cellItem
-                        .map(imageDetailToLogseqImageMarkdown)
-                        .join(" ");
-                } else {
-                    // Recursive call if there is a table in a table
-                    return formatImageInTableNote(cellItem);
-                }
-            });
+            const cellItems: string[] | TableData = cell
+                .map((cellItem) => {
+                    if (typeof cellItem === "string") {
+                        // Don't do anything for text
+                        return cellItem;
+                    } else if (
+                        // * This is the way to do type narrow with arrays
+                        cellItem.every(
+                            (item): item is ImageDetail => "src" in item
+                        )
+                    ) {
+                        // Format images to logseq markdown syntax
+                        return cellItem
+                            .map(imageDetailToLogseqImageMarkdown)
+                            .join(" ");
+                    } else {
+                        // TODO: We currently do not support nested tables
+                        return undefined;
+                        // // Recursive call if there is a table in a table
+                        // // return formatImageInTableNote(cellItem);
+                    }
+                })
+                // TODO: We currently do not support nested tables
+                .filter((item) => typeof item == "string");
 
             if (cellItems.every((item) => typeof item === "string")) {
                 return cellItems.join("\t");
             }
 
-            return cellItems;
+            assertNever();
         });
     });
+}
+
+export function addWallsToTable(str: string) {
+    return "|" + str + "|";
+}
+
+export function markdownTable(table: twoDimTable) {
+    return table
+        .map((row) =>
+            addWallsToTable(
+                row.map((cell) => cell.replace(/\n/g, "<br>")).join("|")
+            )
+        )
+        .join("\n");
 }
 
 export function TableNoteToLogseq(tableNote: TableNote) {
@@ -101,4 +123,19 @@ export function noteToLogseq(json: Note): string {
             }
         })
         .join("\n");
+}
+
+export function getNoteDepth(note: Note) {
+    if (note.path === "") return 0;
+    return note.path.split(";").length;
+}
+
+export function noteToLogseqByPage(json: Note) {
+    if (getNoteDepth(json) !== 0) {
+        return {
+            pageTitle: "MBBS Notes",
+            pageContent: noteToLogseq(json),
+        };
+    }
+    json.children.forEach((note) => {});
 }
