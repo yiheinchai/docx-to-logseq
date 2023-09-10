@@ -315,7 +315,7 @@ describe("formatSrcLink", () => {
             "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png";
         const formattedSrc = formatSrcLink(src);
         expect(formattedSrc).toBe(
-            "./MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png"
+            "MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png"
         );
     });
 });
@@ -336,7 +336,7 @@ describe("getImageFromElement", () => {
         const img_detail = getImageFromElement(img_element);
 
         expect(img_detail).toStrictEqual({
-            src: "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png",
+            src: "MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png",
             width: 139,
             height: 114,
         });
@@ -377,7 +377,7 @@ describe("getTableFromElement", () => {
 
         // prettier-ignore
         const expectedTableDetail = [
-            [['Foramen transversarium /', 'Transverse foramen', [{src: "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
+            [['Foramen transversarium /', 'Transverse foramen', [{src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
         ]
 
         expect(table_detail).toStrictEqual(expectedTableDetail);
@@ -484,7 +484,7 @@ describe("htmlToJS", () => {
                                                                 {
                                                                     images: [
                                                                         {
-                                                                            src: "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png",
+                                                                            src: "MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png",
                                                                             width: 139,
                                                                             height: 114,
                                                                         },
@@ -499,7 +499,7 @@ describe("htmlToJS", () => {
                                                                                         "Transverse foramen",
                                                                                         [
                                                                                             {
-                                                                                                src: "http://localhost/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png",
+                                                                                                src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png",
                                                                                                 width: 147,
                                                                                                 height: 111,
                                                                                             },

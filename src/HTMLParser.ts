@@ -279,7 +279,7 @@ export function getTextFromElement(currentElement: HTMLElement) {
 export function formatSrcLink(link: string) {
     // Define a regex pattern that matches the http://localhost:1234/ part of the URL
     // Replace the matched part with ./ using the replace method
-    return link.replace(/^http:\/\/localhost(:\d+)?\//, "./");
+    return link.replace(/^http:\/\/localhost(:\d+)?\//, "");
 }
 
 /**

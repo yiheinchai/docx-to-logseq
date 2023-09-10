@@ -1,4 +1,4 @@
-import { Note, TextNote, TextNoteForm } from "../types/types";
+import { ImageNote, Note, TextNote, TextNoteForm } from "../types/types";
 
 export const mockHtml_h1 = /*html*/ `<h1><a name="_Toc103523490">Physiology: Renal</a></h1>`;
 export const mockHtml_h2 = /*html*/ `<h2><a name="_Toc103523491">[037] Overview of Kidney Function</a></h2>`;
@@ -260,5 +260,28 @@ export const mockTreeNotes: TextNote = {
 
 export const mockNote: TextNoteForm = {
     text: "Excretion",
+    children: [],
+};
+
+export const mockTextNote: TextNote = {
+    path: "0;12;32;32",
+    text: "logseq is cool",
+    children: [],
+};
+
+export const mockImageNote: ImageNote = {
+    path: "0;12;32;32",
+    images: [
+        {
+            src: "muskies/elon.png",
+            height: 420,
+            width: 69,
+        },
+        {
+            src: "baldie/bezos.png",
+            height: 666,
+            width: 666,
+        },
+    ],
     children: [],
 };
