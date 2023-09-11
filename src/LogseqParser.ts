@@ -92,6 +92,63 @@ export function formatImageInTableNote(table: TableData): twoDimTable {
         });
     });
 }
+// This function takes an HTML table string as input and returns an array of array
+// Each subarray contains an array of [width, rowspan] for each cell in the corresponding row
+export function parseTable(table) {
+    // This regex matches the opening and closing tags of table rows
+    let rowRegex = /<tr[^>]*>(.*?)<\/tr>/g;
+    // This regex matches the opening and closing tags of table cells
+    let cellRegex = /<(td|th)[^>]*>(.*?)<\/\1>/g;
+    // This regex matches the width attribute of a tag
+    let widthRegex = /width="(\d+)"/;
+    // This regex matches the rowspan attribute of a tag
+    let rowspanRegex = /rowspan="(\d+)"/;
+    // This array will store the result
+    let result = [];
+    // This variable will store the current match of rowRegex
+    let rowMatch;
+    // Loop through all the rows in the table
+    while ((rowMatch = rowRegex.exec(table))) {
+        // Get the content of the current row
+        let rowContent = rowMatch[1];
+        // This array will store the [width, rowspan] arrays for the cells in the current row
+        let rowCells = [];
+        // This variable will store the current match of cellRegex
+        let cellMatch;
+        // Loop through all the cells in the current row
+        while ((cellMatch = cellRegex.exec(rowContent))) {
+            // Get the opening tag of the current cell
+            let cellTag = cellMatch[0];
+            // Get the width attribute of the current cell, or 0 if not found
+            let cellWidth = widthRegex.test(cellTag)
+                ? parseInt(widthRegex.exec(cellTag)[1])
+                : 0;
+            // Get the rowspan attribute of the current cell, or 1 if not found
+            let cellRowspan = rowspanRegex.test(cellTag)
+                ? parseInt(rowspanRegex.exec(cellTag)[1])
+                : 1;
+            // Push the [width, rowspan] array to the rowCells array
+            rowCells.push([cellWidth, cellRowspan]);
+        }
+        // Push the rowCells array to the result array
+        result.push(rowCells);
+    }
+    // Return the result array
+    return result;
+}
+
+export function getMaxRowsMaxCols(table) {
+    const maxRow = table.length;
+    const maxCol = Math.max(...table.map((row) => row.length));
+    return [maxRow, maxCol];
+}
+
+/**
+ * Utilies the width of td elements in HTML to identify merged cells in TableData and duplicates the info in the cell to handle merged cells in markdown
+ * @param table
+ * @param html
+ */
+export function formatMergedCellsInTable(table: TableData, html: string) {}
 
 export function addWallsToTable(str: string) {
     return "|" + str + "|";
