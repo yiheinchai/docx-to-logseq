@@ -5,7 +5,8 @@ import {
     formatImageInTableNote,
     getMaxRowsMaxCols,
     markdownTable,
-    parseTable,
+    getTableMetadata,
+    splitMergedCells,
 } from "../src/LogseqParser";
 import { TableNote } from "../types/types";
 import {
@@ -62,7 +63,6 @@ describe("ImageNoteToLogseq", () => {
 //                 [['Foramen transversarium /', 'Transverse foramen', [{src: "MBBSY1%20Yi%20Hein%20Builds.fld/image199.png", width: 147, height: 111}]], ['Stacked together to form a canal where arteries and veins pass through [thorax to brain]','']],
 //             ],
 //         };
-//         console.log(tableNote);
 //         expect(TableNoteToLogseq(tableNote)).toEqual(
 //             "|Foramen transversarium /\nTransverse foramen\n![image.png](../assets/MBBSY1%20Yi%20Hein%20Builds.fld/image199.png){:height 111, :width 147}|Stacked together to form a canal where arteries and veins pass through [thorax to brain]\n|"
 //         );
@@ -91,9 +91,9 @@ describe("markdownTable", () => {
     });
 });
 
-describe("parseTable", () => {
+describe("getTableMetadata", () => {
     it("works for merged cols to get the widths of the cells and rowspans correctly", () => {
-        const parsedTable = parseTable(mockHtml_table_merge_cols);
+        const parsedTable = getTableMetadata(mockHtml_table_merge_cols);
         expect(parsedTable).toStrictEqual([
             [
                 [173, 1],
@@ -114,8 +114,7 @@ describe("parseTable", () => {
     // 111 130 129 135.  111 130 129 135.   130 129 135
 
     it("works for merged rows to get the widths of the cells and rowspans correctly", () => {
-        const parsedTable = parseTable(mockHtml_table_merge_rows);
-        console.log(parsedTable);
+        const parsedTable = getTableMetadata(mockHtml_table_merge_rows);
         expect(parsedTable).toStrictEqual([
             [
                 [111, 1],
@@ -164,5 +163,107 @@ describe("getMaxRowsMaxCols", () => {
 
         expect(rows).toBe(3);
         expect(cols).toBe(3);
+    });
+});
+
+describe("splitMergedCells", () => {
+    it("is able to handle both merged cols and merged rows", () => {
+        const processedTable = splitMergedCells(
+            [
+                ["Merge Col AB", "C"],
+                ["Merge Row Aval12", "Bval", "Cval"],
+                ["Bval2", "Cval2"],
+            ],
+            [
+                [
+                    [346, 1],
+                    [174, 1],
+                ],
+                [
+                    [173, 2],
+                    [174, 1],
+                    [174, 1],
+                ],
+                [
+                    [173, 1],
+                    [174, 1],
+                ],
+            ]
+        );
+
+        expect(processedTable).toStrictEqual([
+            ["Merge Col AB", "Merge Col AB", "C"],
+            ["Merge Row Aval12", "Bval", "Cval"],
+            ["Merge Row Aval12", "Bval2", "Cval2"],
+        ]);
+    });
+
+    it("is able to handle both merged cols and merged rows in middle parts and end parts", () => {
+        const processedTable = splitMergedCells(
+            [
+                // prettier-ignore
+                ["Merge Col AB", "C", "Merge Col DE", "F", "G", "H"],
+                // prettier-ignore
+                ["Merge Row Aval12","Bval","Cval","Merge Row Dval12","Eval1","Merge Row Fval12", "Gval1", "Hval1"],
+                // prettier-ignore
+                ["Bval2", "Cval2", "Eval2", "Merge Col GH"],
+            ],
+            // prettier-ignore
+            [[[346, 1],[174, 1],[348, 1],[175, 1], [173,1], [174,1]],
+                // prettier-ignore 
+                [[173, 2],[174, 1],[174, 1],[174, 2],[174, 1],[173, 2],[172,1], [175,1]],
+                // prettier-ignore 
+                [[173, 1],[174, 1],[174, 1],[346,1]],
+            ]
+        );
+
+        expect(processedTable).toStrictEqual([
+            // prettier-ignore
+            ["Merge Col AB","Merge Col AB","C","Merge Col DE","Merge Col DE","F", "G", "H"],
+            // prettier-ignore
+            ["Merge Row Aval12", "Bval", "Cval","Merge Row Dval12","Eval1","Merge Row Fval12", "Gval1", "Hval1"],
+            // prettier-ignore
+            ["Merge Row Aval12", "Bval2", "Cval2", "Merge Row Dval12","Eval2","Merge Row Fval12", "Merge Col GH","Merge Col GH"],
+        ]);
+    });
+
+    it("is able to handle both merged cols and merged rows across more than 2 rows/cols", () => {
+        const processedTable = splitMergedCells(
+            [
+                ["Merge Col ABC", "D"],
+                ["Merge Row Aval123", "Bval", "Cval", "Dval"],
+                ["Bval2", "Cval2", "Dval2"],
+                ["Bval3", "Cval3", "Dval3"],
+            ],
+            [
+                [
+                    [525, 1],
+                    [174, 1],
+                ],
+                [
+                    [173, 3],
+                    [174, 1],
+                    [174, 1],
+                    [174, 1],
+                ],
+                [
+                    [173, 1],
+                    [174, 1],
+                    [174, 1],
+                ],
+                [
+                    [173, 1],
+                    [174, 1],
+                    [174, 1],
+                ],
+            ]
+        );
+
+        expect(processedTable).toStrictEqual([
+            ["Merge Col ABC", "Merge Col ABC", "Merge Col ABC", "D"],
+            ["Merge Row Aval123", "Bval", "Cval", "Dval"],
+            ["Merge Row Aval123", "Bval2", "Cval2", "Dval2"],
+            ["Merge Row Aval123", "Bval3", "Cval3", "Dval3"],
+        ]);
     });
 });

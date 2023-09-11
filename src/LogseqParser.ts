@@ -94,7 +94,7 @@ export function formatImageInTableNote(table: TableData): twoDimTable {
 }
 // This function takes an HTML table string as input and returns an array of array
 // Each subarray contains an array of [width, rowspan] for each cell in the corresponding row
-export function parseTable(table) {
+export function getTableMetadata(table) {
     // This regex matches the opening and closing tags of table rows
     let rowRegex = /<tr[^>]*>(.*?)<\/tr>/g;
     // This regex matches the opening and closing tags of table cells
@@ -143,12 +143,99 @@ export function getMaxRowsMaxCols(table) {
     return [maxRow, maxCol];
 }
 
-/**
+// A function that splits the cells of a table according to the metadata
+export function splitMergedCells(table_data, table_metadata) {
+    // A new array to store the processed table
+    let processedTable = [];
+    // Loop through each row of the table data
+    for (let i = 0; i < table_data.length; i++) {
+        // A new array to store the processed row
+        let processedRow = [];
+        // A variable to store the number of cells added to the current row
+        let numAddedCells = 0;
+        // Loop through each cell of the row
+        for (let j = 0; j < table_data[i].length; j++) {
+            // Get the cell value and the metadata
+            let cellValue = table_data[i][j];
+            // Adjust the column index by adding the number of cells added to the current row
+            let colIndex = j + numAddedCells;
+            let cellWidth = table_metadata[i][colIndex][0];
+            let cellRowspan = table_metadata[i][colIndex][1];
+            // Get the minimum cell width in the row
+            let minCellWidth = Math.min(...table_metadata[i].map((x) => x[0]));
+            // Check if the cell width is approximately a multiple of the minimum cell width, indicating a merged column
+            // Use a tolerance of 10 pixels for approximation
+            let tolerance = 10;
+            if (
+                cellWidth > minCellWidth + tolerance &&
+                Math.abs(cellWidth % minCellWidth) - minCellWidth <= tolerance
+            ) {
+                // Get the number of cells to be split
+                let numSplitCells = Math.round(cellWidth / minCellWidth);
+                // Split the cell into numSplitCells cells with the same value and metadata
+                table_metadata[i].splice(colIndex, 1);
+
+                for (let k = 0; k < numSplitCells; k++) {
+                    processedRow.push(cellValue);
+
+                    // Make sure to delete the current metadata cell
+
+                    // Update the table_metadata array with the same cell width and rowspan as the original cell
+                    table_metadata[i].splice(colIndex + k, 0, [
+                        minCellWidth,
+                        cellRowspan,
+                    ]);
+                }
+                // Update the number of cells added to the current row
+                numAddedCells += numSplitCells - 1;
+            } else {
+                // Keep the cell as it is
+                processedRow.push(cellValue);
+            }
+            // Check if the cell rowspan is more than one, indicating a merged row
+            if (cellRowspan > 1) {
+                // Loop through the number of rows to be merged
+                for (let k = 1; k < cellRowspan; k++) {
+                    // Get the index of the row below
+                    let nextRowIndex = i + k;
+                    // Check if the row below exists in the table data
+                    if (table_data[nextRowIndex]) {
+                        // Insert a new cell with the same value and metadata at the same column index
+                        table_data[nextRowIndex].splice(colIndex, 0, cellValue);
+                        table_metadata[nextRowIndex].splice(colIndex, 0, [
+                            cellWidth,
+                            1,
+                        ]);
+                    } else {
+                        // Create a new row with an empty cell at the same column index
+                        let newRow = new Array(table_data[i].length).fill("");
+                        newRow[colIndex] = cellValue;
+                        table_data.push(newRow);
+                        // Create a new row in the table_metadata array with an empty cell at the same column index
+                        let newMetaRow = new Array(
+                            table_metadata[i].length
+                        ).fill([0, 0]);
+                        newMetaRow[colIndex] = [cellWidth, 1];
+                        table_metadata.push(newMetaRow);
+                    }
+                }
+            }
+        }
+        // Push the processed row to the processed table
+        processedTable.push(processedRow);
+    }
+    // Return the processed table
+    return processedTable;
+}
+
+/*
  * Utilies the width of td elements in HTML to identify merged cells in TableData and duplicates the info in the cell to handle merged cells in markdown
  * @param table
  * @param html
  */
-export function formatMergedCellsInTable(table: TableData, html: string) {}
+export function formatMergedCellsInTable(table: TableData, html: string) {
+    return splitMergedCells(table, getTableMetadata(html));
+}
 
 export function addWallsToTable(str: string) {
     return "|" + str + "|";
