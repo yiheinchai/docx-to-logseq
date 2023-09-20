@@ -10,22 +10,63 @@ import {
     getPropByString,
     parseDirectoryPage,
     noteToLogseqByPage,
+    findClosestPTag,
+    styleTextInTable,
 } from "../src/LogseqParser";
 import { TableNote } from "../types/types";
 import {
+    mockHtml2,
     mockHtml_table_image,
     mockHtml_table_merge_cols,
     mockHtml_table_merge_rows,
     mockHtml_table_real,
+    mockHtml_table_text,
+    mockHtml_table_text_bold_underline,
     mockImageNote,
     mockTextNote,
+    mockTextNote_bold,
+    mockTextNote_underline,
 } from "./mocks";
+
+describe("findPTag", () => {
+    it("is able to find p tag html based on search string", () => {
+        const html = findClosestPTag(mockHtml2, "FHMP");
+        console.log(html);
+        expect(html).toBe(
+            '<p class="MsoTitle"> <a name="_Toc95808416"></a><a name="_Toc102616402"><span lang="EN-US">FHMP</span></a> </p>'
+        );
+    });
+});
+
+describe("styleTextInTable", () => {
+    it("is able to style text correctly", () => {
+        const styledTable = styleTextInTable(
+            [[["Structure"], ["Function"]]],
+            mockHtml_table_text_bold_underline
+        );
+        expect(styledTable).toStrictEqual([
+            [["**Structure**"], ["<u>Function</u>"]],
+        ]);
+    });
+});
 
 describe("TextNoteToLogseq", () => {
     it("should return the correct string", () => {
         const logseqNote = TextNoteToLogseq(mockTextNote);
 
         expect(logseqNote).toBe("\t\t\t\t- logseq is cool");
+    });
+
+    it("should handle bolds", () => {
+        const logseqNote = TextNoteToLogseq(mockTextNote_bold);
+
+        expect(logseqNote).toBe("\t\t\t\t- **Adhesion:**");
+    });
+
+    it("should handle underlines", () => {
+        const logseqNote = TextNoteToLogseq(mockTextNote_underline);
+
+        expect(logseqNote).toBe("\t\t\t\t- <u>Mechanism of Action: </u>");
     });
 });
 
@@ -80,7 +121,9 @@ describe("markdownTable", () => {
             ["value1", "value2"],
         ]);
 
-        expect(markdown).toBe(`|header1|header2|\n|value1|value2|`);
+        expect(markdown).toBe(
+            `|header1|header2|\n|value1|value2|\nlogseq.table.version:: 2`
+        );
     });
 
     it("is able to handle table with double lines", () => {
@@ -90,7 +133,7 @@ describe("markdownTable", () => {
         ]);
 
         expect(markdown).toBe(
-            `|header1|header2|\n|value1<br>value1 information|value2|`
+            `|header1|header2|\n|value1[:br]value1 information|value2|\nlogseq.table.version:: 2`
         );
     });
 });
@@ -147,7 +190,6 @@ describe("getTableMetadata", () => {
     });
     it("works for a real table", () => {
         const parsedTable = getTableMetadata(mockHtml_table_real);
-        console.log(parsedTable);
         expect(parsedTable).toStrictEqual([
             [
                 [173, 1],
@@ -317,7 +359,7 @@ describe("parseDirectoryPage", () => {
             ],
         });
 
-        expect(page).toBe("- Anatomy\n- Biochemistry");
+        expect(page).toBe("- [[Anatomy]]\n- [[Biochemistry]]");
     });
 
     it("should be able to handle deeper depths", () => {
@@ -359,7 +401,7 @@ describe("parseDirectoryPage", () => {
         );
 
         expect(page).toBe(
-            "- Anatomy\n\t- [001]: Introduction to Anatomy\n- Biochemistry\n\t- [012]: Introduction to Biochemistry"
+            "- [[Anatomy]]\n\t- [[[001]: Introduction to Anatomy]]\n- [[Biochemistry]]\n\t- [[[012]: Introduction to Biochemistry]]"
         );
     });
 });
@@ -425,19 +467,20 @@ describe("noteToLogseqByPage", () => {
             ],
         });
 
-        console.log(pages);
-
         expect(pages).toStrictEqual([
-            { pageTitle: "root", pageContent: "- FHMP\n- I&D" },
+            {
+                pageTitle: "Year 1 MBBS Notes",
+                pageContent: "- [[FHMP]]\n- [[I&D]]",
+            },
             {
                 pageTitle: "FHMP",
                 pageContent:
-                    "- Anatomy\n\t- [001]: Introduction to Anatomy\n- Biochemistry\n\t- [012]: Introduction to Biochemistry",
+                    "- [[Anatomy]]\n\t- [[[001]: Introduction to Anatomy]]\n- [[Biochemistry]]\n\t- [[[012]: Introduction to Biochemistry]]",
             },
             {
                 pageTitle: "I&D",
                 pageContent:
-                    "- Immunology\n\t- [001]: Introduction to Immunology",
+                    "- [[Immunology]]\n\t- [[[001]: Introduction to Immunology]]",
             },
             { pageTitle: "[001]: Introduction to Anatomy", pageContent: "" },
             {

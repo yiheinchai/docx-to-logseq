@@ -17,9 +17,27 @@ export function addLogseqBullet(depth: number, text: string) {
     return LOGSEQ_TAB.repeat(depth) + LOGSEQ_BULLET + text;
 }
 
+export function boldText(text: string) {
+    return `**${text}**`;
+}
+
+export function underlineText(text: string) {
+    return `<u>${text}</u>`;
+}
+
+export function styleText(text: string, html: string) {
+    if (html.includes("<b>")) {
+        return boldText(text);
+    } else if (html.includes("<u>")) {
+        return underlineText(text);
+    } else {
+        return text;
+    }
+}
+
 export function TextNoteToLogseq(textNote: TextNote) {
     const depth = textNote.path.split(";").length;
-    return addLogseqBullet(depth, textNote.text);
+    return addLogseqBullet(depth, styleText(textNote.text, textNote.html));
 }
 
 export function getLogseqImageMarkdown(
@@ -98,6 +116,49 @@ export function formatImageInTableNote(table: TableData): twoDimTable {
         });
     });
 }
+
+export function findClosestPTag(
+    html: string,
+    searchString: string
+): string | null {
+    const results = html
+        .match(/<p[^>]*>.*?<\/p>/g)
+        .filter((tag) => tag.includes(searchString));
+
+    if (results.length > 0) {
+        return results[0];
+    }
+
+    return null;
+}
+
+export function styleTextInTable(table: TableData, html: string): TableData {
+    return table.map((row) => {
+        return row.map((cell) => {
+            const cellItems: (string | TableData | ImageDetail[])[] = cell.map(
+                (cellItem) => {
+                    if (typeof cellItem === "string") {
+                        const pHtml = findClosestPTag(html, cellItem);
+
+                        if (pHtml != null) {
+                            return styleText(
+                                cellItem,
+                                findClosestPTag(html, cellItem)
+                            );
+                        }
+
+                        return cellItem;
+                    }
+
+                    return cellItem;
+                }
+            );
+
+            return cellItems;
+        });
+    });
+}
+
 // This function takes an HTML table string as input and returns an array of array
 // Each subarray contains an array of [width, rowspan] for each cell in the corresponding row
 export function getTableMetadata(table) {
@@ -247,7 +308,7 @@ export function addWallsToTable(str: string) {
     return "|" + str + "|";
 }
 
-const LOGSEQ_TABLE_PROPERTIES = " logseq.table.version:: 2";
+const LOGSEQ_TABLE_PROPERTIES = "\nlogseq.table.version:: 2";
 
 export function markdownTable(table: twoDimTable) {
     return (
@@ -262,10 +323,8 @@ export function markdownTable(table: twoDimTable) {
 }
 
 export function TableNoteToLogseq(tableNote: TableNote) {
-    const formatMerged = formatMergedCellsInTable(
-        tableNote.table,
-        tableNote.html
-    );
+    const formatText = styleTextInTable(tableNote.table, tableNote.html);
+    const formatMerged = formatMergedCellsInTable(formatText, tableNote.html);
     const formatImage = formatImageInTableNote(formatMerged);
     return markdownTable(formatImage);
 }
