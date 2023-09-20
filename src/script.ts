@@ -1,5 +1,9 @@
+import { LogseqPage } from "../types/types";
 import { htmlToJS } from "./HTMLParser";
-import { noteToLogseq } from "./LogseqParser";
+import { noteToLogseq, noteToLogseqByPage } from "./LogseqParser";
+// Import JSZip and FileSaver libraries
+import FileSaver from "file-saver";
+import { downloadZip } from "client-zip/index.js";
 
 function handleFileSelect(event: Event) {
     // Get the selected file from the input element
@@ -31,7 +35,7 @@ function convertFile() {
     // Create a file reader object
     const reader = new FileReader();
     // Define a callback function for when the file is loaded
-    reader.onload = function (event) {
+    reader.onload = async function (event) {
         // Get the file content as a string
         const html = event.target.result as string;
         // Parse the HTML string into a DOM tree
@@ -57,10 +61,18 @@ function convertFile() {
         // // Show the download link on the page
         // link.classList.remove("hidden");
 
-        const logseqNote = noteToLogseq(json);
-        const logseqBlob = new Blob([logseqNote], { type: "text/plain" });
+        const FILE_EXTENSION = ".md";
+
+        const pages = noteToLogseqByPage(json).map((pg) => ({
+            name: pg.pageTitle + FILE_EXTENSION,
+            input: pg.pageContent,
+        }));
+
+        // get the ZIP stream in a Blob
+        const blob = await downloadZip(pages).blob();
+
         // Create a URL for the blob object
-        const url = URL.createObjectURL(logseqBlob);
+        const url = URL.createObjectURL(blob);
         // Get the download link element from the page
         const link = document.getElementById(
             "download-link"
@@ -68,7 +80,7 @@ function convertFile() {
         // Set the href attribute of the link to the blob URL
         link.href = url;
         // Set the download attribute of the link to the file name with .json extension
-        link.download = file.name.replace(".html", ".md");
+        link.download = "notes.zip";
         // Show the download link on the page
         link.classList.remove("hidden");
     };

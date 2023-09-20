@@ -7,6 +7,9 @@ import {
     markdownTable,
     getTableMetadata,
     splitMergedCells,
+    getPropByString,
+    parseDirectoryPage,
+    noteToLogseqByPage,
 } from "../src/LogseqParser";
 import { TableNote } from "../types/types";
 import {
@@ -284,6 +287,164 @@ describe("splitMergedCells", () => {
             ["Merge Row Aval123", "Bval", "Cval", "Dval"],
             ["Merge Row Aval123", "Bval2", "Cval2", "Dval2"],
             ["Merge Row Aval123", "Bval3", "Cval3", "Dval3"],
+        ]);
+    });
+});
+
+describe("getPropByString", () => {
+    it("is able to extract nested values", () => {
+        const val = getPropByString(
+            {
+                text: "level1",
+                children: [{ text: "level2", children: [{ text: "level3" }] }],
+            },
+            "children.0.children.0.text"
+        );
+
+        expect(val).toBe("level3");
+    });
+});
+
+describe("parseDirectoryPage", () => {
+    it("should output the right format", () => {
+        const page = parseDirectoryPage({
+            text: "FHMP",
+            html: "",
+            path: "",
+            children: [
+                { text: "Anatomy", children: [], html: "", path: "" },
+                { text: "Biochemistry", children: [], html: "", path: "" },
+            ],
+        });
+
+        expect(page).toBe("- Anatomy\n- Biochemistry");
+    });
+
+    it("should be able to handle deeper depths", () => {
+        const page = parseDirectoryPage(
+            {
+                text: "FHMP",
+                html: "",
+                path: "",
+                children: [
+                    {
+                        text: "Anatomy",
+                        children: [
+                            {
+                                text: "[001]: Introduction to Anatomy",
+                                path: "",
+                                children: [],
+                                html: "",
+                            },
+                        ],
+                        html: "",
+                        path: "",
+                    },
+                    {
+                        text: "Biochemistry",
+                        children: [
+                            {
+                                text: "[012]: Introduction to Biochemistry",
+                                path: "",
+                                children: [],
+                                html: "",
+                            },
+                        ],
+                        html: "",
+                        path: "",
+                    },
+                ],
+            },
+            2
+        );
+
+        expect(page).toBe(
+            "- Anatomy\n\t- [001]: Introduction to Anatomy\n- Biochemistry\n\t- [012]: Introduction to Biochemistry"
+        );
+    });
+});
+
+describe("noteToLogseqByPage", () => {
+    it("should generate the pages correctly", () => {
+        const pages = noteToLogseqByPage({
+            path: "",
+            children: [
+                {
+                    text: "FHMP",
+                    html: "",
+                    path: "",
+                    children: [
+                        {
+                            text: "Anatomy",
+                            children: [
+                                {
+                                    text: "[001]: Introduction to Anatomy",
+                                    path: "",
+                                    children: [],
+                                    html: "",
+                                },
+                            ],
+                            html: "",
+                            path: "",
+                        },
+                        {
+                            text: "Biochemistry",
+                            children: [
+                                {
+                                    text: "[012]: Introduction to Biochemistry",
+                                    path: "",
+                                    children: [],
+                                    html: "",
+                                },
+                            ],
+                            html: "",
+                            path: "",
+                        },
+                    ],
+                },
+                {
+                    text: "I&D",
+                    html: "",
+                    path: "",
+                    children: [
+                        {
+                            text: "Immunology",
+                            children: [
+                                {
+                                    text: "[001]: Introduction to Immunology",
+                                    path: "",
+                                    children: [],
+                                    html: "",
+                                },
+                            ],
+                            html: "",
+                            path: "",
+                        },
+                    ],
+                },
+            ],
+        });
+
+        console.log(pages);
+
+        expect(pages).toStrictEqual([
+            { pageTitle: "root", pageContent: "- FHMP\n- I&D" },
+            {
+                pageTitle: "FHMP",
+                pageContent:
+                    "- Anatomy\n\t- [001]: Introduction to Anatomy\n- Biochemistry\n\t- [012]: Introduction to Biochemistry",
+            },
+            {
+                pageTitle: "I&D",
+                pageContent:
+                    "- Immunology\n\t- [001]: Introduction to Immunology",
+            },
+            { pageTitle: "[001]: Introduction to Anatomy", pageContent: "" },
+            {
+                pageTitle: "[012]: Introduction to Biochemistry",
+                pageContent: "",
+            },
+            { pageTitle: "[001]: Introduction to Immunology", pageContent: "" },
         ]);
     });
 });

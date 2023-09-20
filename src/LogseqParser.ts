@@ -1,6 +1,7 @@
 import {
     ImageDetail,
     ImageNote,
+    LogseqPage,
     Note,
     TableData,
     TableNote,
@@ -26,7 +27,12 @@ export function getLogseqImageMarkdown(
     height: number,
     width: number
 ) {
-    return `![image.png](../assets/${src}){:height ${height}, :width ${width}}`;
+    if (src.includes("missing.gif")) return "";
+    if (width < 50 || height < 50) return "";
+
+    return `![image.png](../assets/${decodeURI(
+        src
+    )}){:height ${height}, :width ${width}}`;
 }
 
 /**
@@ -241,14 +247,18 @@ export function addWallsToTable(str: string) {
     return "|" + str + "|";
 }
 
+const LOGSEQ_TABLE_PROPERTIES = " logseq.table.version:: 2";
+
 export function markdownTable(table: twoDimTable) {
-    return table
-        .map((row) =>
-            addWallsToTable(
-                row.map((cell) => cell.replace(/\n/g, "<br>")).join("|")
+    return (
+        table
+            .map((row) =>
+                addWallsToTable(
+                    row.map((cell) => cell.replace(/\n/g, "[:br]")).join("|")
+                )
             )
-        )
-        .join("\n");
+            .join("\n") + LOGSEQ_TABLE_PROPERTIES
+    );
 }
 
 export function TableNoteToLogseq(tableNote: TableNote) {
@@ -279,12 +289,99 @@ export function getNoteDepth(note: Note) {
     return note.path.split(";").length;
 }
 
-export function noteToLogseqByPage(json: Note) {
-    if (getNoteDepth(json) !== 0) {
-        return {
-            pageTitle: "MBBS Notes",
-            pageContent: noteToLogseq(json),
-        };
+// Define a type for the object parameter
+type ObjType = {
+    [key: string]: any;
+};
+
+// Define a function that takes an object and a propString as parameters
+// and returns any type as the result
+export function getPropByString(obj: ObjType, propString: string): any {
+    // Check if propString is empty
+    if (!propString) return obj;
+
+    // Declare a variable to store the current property
+    let prop: string;
+
+    // Split the propString by dots and store it in an array
+    let props = propString.split(".");
+
+    // Loop through the props array except the last element
+    for (let i = 0, iLen = props.length - 1; i < iLen; i++) {
+        // Get the current property
+        prop = props[i];
+
+        // Get the value of the property from the object
+        let candidate = obj[prop];
+
+        // Check if the value is not undefined
+        if (candidate !== undefined) {
+            // Update the object with the value
+            obj = candidate;
+        } else {
+            // Break the loop
+            break;
+        }
     }
-    json.children.forEach((note) => {});
+
+    // Return the value of the last property from the object
+    return obj[props[props.length - 1]];
+}
+
+export function addLogseqPageTag(string: string) {
+    return `[[${string}]]`;
+}
+
+export function parseDirectoryPage(
+    json: Note | TextNote,
+    depth = 1,
+    currentDepth = 1
+): string {
+    return json.children
+        .map((note: TextNote) => {
+            if (currentDepth === depth) {
+                return addLogseqBullet(
+                    currentDepth - 1,
+                    addLogseqPageTag(note.text)
+                );
+            } else if (currentDepth < depth) {
+                return (
+                    addLogseqBullet(
+                        currentDepth - 1,
+                        addLogseqPageTag(note.text)
+                    ) +
+                    "\n" +
+                    parseDirectoryPage(note, depth, currentDepth + 1)
+                );
+            }
+
+            assertNever();
+        })
+        .join("\n");
+}
+
+export function noteToLogseqByPage(json: Note): LogseqPage[] {
+    // The depth in which the note should be placed in a page
+    const ROOT_PAGE_TITLE = "Year 1 MBBS Notes";
+
+    const rootPage = {
+        pageTitle: ROOT_PAGE_TITLE,
+        pageContent: parseDirectoryPage(json),
+    };
+    const modulePages = json.children.map((module: TextNote) => {
+        return {
+            pageTitle: module.text,
+            pageContent: parseDirectoryPage(module, 2),
+        };
+    });
+    const notePages = json.children.flatMap((module) =>
+        module.children.flatMap((submodule) =>
+            submodule.children.map((lecture: TextNote) => ({
+                pageTitle: lecture.text,
+                pageContent: noteToLogseq(lecture),
+            }))
+        )
+    );
+
+    return [rootPage, ...modulePages, ...notePages];
 }
