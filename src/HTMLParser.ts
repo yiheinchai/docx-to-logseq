@@ -383,11 +383,16 @@ export function getElementData(element: HTMLElement) {
         element.nodeName,
         element.className
     );
-    assertNever();
+    // assertNever();
+}
+
+export function removeNewLines(string: string) {
+    const regex = /\r?\n|\r/g;
+    return string.replace(regex, "");
 }
 
 export function getElementHtml(ele: HTMLElement) {
-    return ele.outerHTML;
+    return removeNewLines(ele.outerHTML);
 }
 
 /**

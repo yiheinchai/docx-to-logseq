@@ -15,6 +15,7 @@ import {
     elementDataToNote,
     htmlToJS,
     formatSrcLink,
+    getElementHtml,
 } from "../src/HTMLParser";
 import {
     mockHtml,
@@ -28,6 +29,7 @@ import {
     mockHtml_p2_2,
     mockHtml_p3,
     mockHtml_table_image,
+    mockHtml_table_real,
     mockHtml_table_text,
     mockNote,
     mockTreeNotes,
@@ -317,6 +319,25 @@ describe("formatSrcLink", () => {
         expect(formattedSrc).toBe(
             "MBBSY1%20Yi%20Hein%20Builds.fld/image1161.png"
         );
+    });
+});
+
+describe("getElementHTML", () => {
+    beforeEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    it("is able to retrieve HTML without newlines", () => {
+        // TODO: Unable to replicate the situation where outerHTML gives newlines
+        document.body.innerHTML = mockHtml_table_real;
+        const table = document.querySelector("table");
+
+        if (table == null)
+            throw new Error("table element mock is configured wrongly!");
+
+        const html = getElementHtml(table);
+
+        expect(html).toBe(mockHtml_table_real);
     });
 });
 

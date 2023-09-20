@@ -13,6 +13,7 @@ import {
     mockHtml_table_image,
     mockHtml_table_merge_cols,
     mockHtml_table_merge_rows,
+    mockHtml_table_real,
     mockImageNote,
     mockTextNote,
 } from "./mocks";
@@ -138,6 +139,25 @@ describe("getTableMetadata", () => {
                 [130, 1],
                 [129, 1],
                 [135, 1],
+            ],
+        ]);
+    });
+    it("works for a real table", () => {
+        const parsedTable = getTableMetadata(mockHtml_table_real);
+        console.log(parsedTable);
+        expect(parsedTable).toStrictEqual([
+            [
+                [173, 1],
+                [174, 1],
+                [174, 1],
+            ],
+            [
+                [346, 1],
+                [174, 1],
+            ],
+            [
+                [173, 1],
+                [347, 1],
             ],
         ]);
     });

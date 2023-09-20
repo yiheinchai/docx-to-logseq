@@ -252,7 +252,12 @@ export function markdownTable(table: twoDimTable) {
 }
 
 export function TableNoteToLogseq(tableNote: TableNote) {
-    return markdownTable(formatImageInTableNote(tableNote.table));
+    const formatMerged = formatMergedCellsInTable(
+        tableNote.table,
+        tableNote.html
+    );
+    const formatImage = formatImageInTableNote(formatMerged);
+    return markdownTable(formatImage);
 }
 
 export function noteToLogseq(json: Note): string {
