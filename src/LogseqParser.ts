@@ -85,7 +85,7 @@ export function formatImageInTableNote(table: TableData): twoDimTable {
                 .filter((item) => typeof item == "string");
 
             if (cellItems.every((item) => typeof item === "string")) {
-                return cellItems.join("\t");
+                return cellItems.join("\n");
             }
 
             assertNever();
