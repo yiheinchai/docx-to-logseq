@@ -195,6 +195,11 @@ describe("cleanText", () => {
         const noNewLines = cleanText(`\nthere is new lines\n\n`);
         expect(noNewLines).toBe("there is new lines");
     });
+
+    it("removes double spaces", () => {
+        const noNewLines = cleanText(`there is double  space`);
+        expect(noNewLines).toBe("there is double space");
+    });
 });
 
 describe("checkIfSymbol", () => {
