@@ -12,6 +12,7 @@ import {
 
 const LOGSEQ_TAB = "\t";
 const LOGSEQ_BULLET = "- ";
+const DEFAULT_INTENT_OFFSET = 4;
 
 export function addLogseqBullet(depth: number, text: string) {
     return LOGSEQ_TAB.repeat(depth) + LOGSEQ_BULLET + text;
@@ -35,8 +36,11 @@ export function styleText(text: string, html: string) {
     }
 }
 
-export function TextNoteToLogseq(textNote: TextNote) {
-    const depth = textNote.path.split(";").length;
+export function TextNoteToLogseq(
+    textNote: TextNote,
+    offset = DEFAULT_INTENT_OFFSET
+) {
+    const depth = getNoteDepth(textNote, offset);
     return addLogseqBullet(depth, styleText(textNote.text, textNote.html));
 }
 
@@ -66,8 +70,11 @@ export function imageDetailToLogseqImageMarkdown(imageDetail: ImageDetail) {
     );
 }
 
-export function ImageNoteToLogseq(imageNote: ImageNote) {
-    const depth = imageNote.path.split(";").length;
+export function ImageNoteToLogseq(
+    imageNote: ImageNote,
+    offset = DEFAULT_INTENT_OFFSET
+) {
+    const depth = getNoteDepth(imageNote, offset);
     const imagesText = imageNote.images
         .map(imageDetailToLogseqImageMarkdown)
         .join(" ");
@@ -343,9 +350,14 @@ export function noteToLogseq(json: Note): string {
         .join("\n");
 }
 
-export function getNoteDepth(note: Note) {
+export function getNoteDepth(note: Note, offset = 4) {
     if (note.path === "") return 0;
-    return note.path.split(";").length;
+    const depth = note.path.split(";").length;
+    if (depth >= offset) {
+        // OFFSET such that pages start off with 0 tab
+        return depth - offset;
+    }
+    return depth;
 }
 
 // Define a type for the object parameter
@@ -444,3 +456,26 @@ export function noteToLogseqByPage(json: Note): LogseqPage[] {
 
     return [rootPage, ...modulePages, ...notePages];
 }
+// export function noteToLogseqByPage(json: Note): LogseqPage[] {
+//     // The depth in which the note should be placed in a page
+//     const ROOT_PAGE_TITLE = "Year 3 Neuroscience iBSc Notes";
+
+//     const rootPage = {
+//         pageTitle: ROOT_PAGE_TITLE,
+//         pageContent: parseDirectoryPage(json),
+//     };
+//     const modulePages = json.children.map((module: TextNote) => {
+//         return {
+//             pageTitle: module.text,
+//             pageContent: parseDirectoryPage(module, 1),
+//         };
+//     });
+//     const notePages = json.children.flatMap((module) =>
+//         module.children.flatMap((lecture: TextNote) => ({
+//             pageTitle: lecture.text,
+//             pageContent: noteToLogseq(lecture),
+//         }))
+//     );
+
+//     return [rootPage, ...modulePages, ...notePages];
+// }

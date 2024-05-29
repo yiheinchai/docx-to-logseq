@@ -52,19 +52,19 @@ describe("styleTextInTable", () => {
 
 describe("TextNoteToLogseq", () => {
     it("should return the correct string", () => {
-        const logseqNote = TextNoteToLogseq(mockTextNote);
+        const logseqNote = TextNoteToLogseq(mockTextNote, 0);
 
         expect(logseqNote).toBe("\t\t\t\t- logseq is cool");
     });
 
     it("should handle bolds", () => {
-        const logseqNote = TextNoteToLogseq(mockTextNote_bold);
+        const logseqNote = TextNoteToLogseq(mockTextNote_bold, 0);
 
         expect(logseqNote).toBe("\t\t\t\t- **Adhesion:**");
     });
 
     it("should handle underlines", () => {
-        const logseqNote = TextNoteToLogseq(mockTextNote_underline);
+        const logseqNote = TextNoteToLogseq(mockTextNote_underline, 0);
 
         expect(logseqNote).toBe("\t\t\t\t- <u>Mechanism of Action: </u>");
     });
@@ -72,7 +72,7 @@ describe("TextNoteToLogseq", () => {
 
 describe("ImageNoteToLogseq", () => {
     it("should return the correct string", () => {
-        const logseqNote = ImageNoteToLogseq(mockImageNote);
+        const logseqNote = ImageNoteToLogseq(mockImageNote, 0);
 
         expect(logseqNote).toBe(
             "\t\t\t\t- ![image.png](../assets/muskies/elon.png){:height 420, :width 69} ![image.png](../assets/baldie/bezos.png){:height 666, :width 666}"
