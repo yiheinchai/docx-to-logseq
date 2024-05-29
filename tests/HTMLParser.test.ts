@@ -166,6 +166,18 @@ describe("getTextFromElement", () => {
             expect(text).toBeFalsy();
         });
     });
+
+    test("avoids the double space bug when extracting text content from text node", () => {
+        document.body.innerHTML = `<p class="MsoNormal" style="margin-bottom:0cm;line-height:normal">Occurs in
+        cytosol</p>`;
+        const p_element = document.querySelector("p");
+
+        if (p_element == null)
+            throw new Error("p element mock is configured wrongly!");
+
+        const text = getTextFromElement(p_element);
+        expect(text).toBe("Occurs in cytosol");
+    });
 });
 
 describe("cleanText", () => {

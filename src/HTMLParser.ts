@@ -232,9 +232,10 @@ const SYMBOL_FONT_FAMILIES = [
 export function cleanText(text: string) {
     const noBreakingSpaces = text.replace(/\u00A0/g, "");
     const noSideSpaces = noBreakingSpaces.trim();
-    const noNewLines = noSideSpaces.replace(/\n/g, " ");
+    const noNewLines = noSideSpaces.replace(/[\n\r]+|[\s]{2,}/g, " ");
+    const noDoubleSpaces = noNewLines.replace(/  +/g, " ");
 
-    return noNewLines;
+    return noDoubleSpaces;
 }
 
 /**
@@ -261,17 +262,20 @@ const TEXT_CHILD_ELEMENTS = ["span", "sub", "a", "#text"];
 export function getTextFromElement(currentElement: HTMLElement) {
     const childNodes = Array.from(currentElement.childNodes);
 
-    const textNodes = childNodes.reduce((texts: string[], node: Node) => {
-        // Guard clause to prevent parsing bullet points (bullet points have font family set)
-        if (checkIfSymbol(node)) return texts;
+    const textNodes = childNodes.reduce(
+        (texts: string[], node: HTMLElement) => {
+            // Guard clause to prevent parsing bullet points (bullet points have font family set)
+            if (checkIfSymbol(node)) return texts;
 
-        if (node.textContent) {
-            texts.push(node.textContent);
+            if (node.textContent) {
+                texts.push(node.textContent);
+                return texts;
+            }
+
             return texts;
-        }
-
-        return texts;
-    }, []);
+        },
+        []
+    );
     const text = cleanText(textNodes.join(" "));
 
     return text;
